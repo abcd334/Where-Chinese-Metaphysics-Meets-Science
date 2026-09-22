@@ -47,12 +47,18 @@ class ElementRelation(DataModel):
     relation: RelationType
 
 
+class HiddenStemSet(DataModel):
+    branch_id: Identifier
+    stem_ids: tuple[Identifier, ...] = Field(min_length=1)
+
+
 class KnowledgeData(DataModel):
     yin_yang: tuple[YinYang, ...] = Field(min_length=2, max_length=2)
     elements: tuple[Element, ...] = Field(min_length=5, max_length=5)
     heavenly_stems: tuple[HeavenlyStem, ...] = Field(min_length=10, max_length=10)
     earthly_branches: tuple[EarthlyBranch, ...] = Field(min_length=12, max_length=12)
     relations: tuple[ElementRelation, ...] = Field(min_length=10, max_length=10)
+    hidden_stems: tuple[HiddenStemSet, ...] = Field(min_length=12, max_length=12)
 
     @model_validator(mode="after")
     def validate_integrity(self) -> Self:
@@ -95,4 +101,20 @@ class KnowledgeData(DataModel):
                 or {edge.target for edge in edges} != element_ids
             ):
                 raise ValueError(f"relations: {kind} needs one incoming/outgoing edge per element")
+
+        branch_ids = {record.id for record in self.earthly_branches}
+        stem_ids = {record.id for record in self.heavenly_stems}
+        seen_branches = set()
+        for record in self.hidden_stems:
+            if record.branch_id not in branch_ids:
+                raise ValueError(f"hidden_stems: unknown branch reference {record.branch_id!r}")
+            if record.branch_id in seen_branches:
+                raise ValueError(f"hidden_stems: duplicate branch reference {record.branch_id!r}")
+            seen_branches.add(record.branch_id)
+            if len(set(record.stem_ids)) != len(record.stem_ids):
+                raise ValueError(f"hidden_stems: duplicate stem reference for {record.branch_id!r}")
+            if not set(record.stem_ids) <= stem_ids:
+                raise ValueError(f"hidden_stems: unknown stem reference for {record.branch_id!r}")
+        if seen_branches != branch_ids:
+            raise ValueError("hidden_stems: every earthly branch needs a mapping")
         return self

@@ -1,0 +1,27 @@
+# Source: README.md — phase2-spec (user-supplied canonical dataset).
+# List order is canonical ordering only, not weight or qi classification.
+hidden_stems:
+  - branch_id: zi
+    stem_ids: [gui]
+  - branch_id: chou
+    stem_ids: [ji, gui, xin]
+  - branch_id: yin
+    stem_ids: [jia, bing, wu]
+  - branch_id: mao
+    stem_ids: [yi]
+  - branch_id: chen
+    stem_ids: [wu, yi, gui]
+  - branch_id: si
+    stem_ids: [bing, wu, geng]
+  - branch_id: wu
+    stem_ids: [ding, ji]
+  - branch_id: wei
+    stem_ids: [ji, ding, yi]
+  - branch_id: shen
+    stem_ids: [geng, ren, wu]
+  - branch_id: you
+    stem_ids: [xin]
+  - branch_id: xu
+    stem_ids: [wu, xin, ding]
+  - branch_id: hai
+    stem_ids: [ren, jia]

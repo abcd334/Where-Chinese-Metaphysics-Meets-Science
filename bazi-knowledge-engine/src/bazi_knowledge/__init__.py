@@ -1,4 +1,4 @@
-"""Phase 1: foundational Bazi data and direct relation lookup."""
+"""Bazi knowledge data: basic attributes, direct relations, and hidden stems."""
 
 from .loader import (
     KnowledgeBase,
@@ -7,13 +7,16 @@ from .loader import (
     get_element_relation,
     get_generating_element,
     get_heavenly_stem,
+    get_hidden_stems,
     load_knowledge,
 )
-from .models import EarthlyBranch, Element, ElementRelation, HeavenlyStem, KnowledgeData, YinYang
+from .models import (
+    EarthlyBranch, Element, ElementRelation, HeavenlyStem, HiddenStemSet, KnowledgeData, YinYang,
+)
 
 __all__ = [
     "KnowledgeBase", "KnowledgeData", "YinYang", "Element", "ElementRelation",
     "HeavenlyStem", "EarthlyBranch", "load_knowledge", "get_heavenly_stem",
     "get_earthly_branch", "get_generating_element", "get_controlling_element",
-    "get_element_relation",
+    "get_element_relation", "HiddenStemSet", "get_hidden_stems",
 ]

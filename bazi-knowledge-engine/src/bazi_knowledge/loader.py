@@ -23,7 +23,7 @@ class _UniqueKeyLoader(yaml.SafeLoader):
 
 
 def load_knowledge(knowledge_dir: str | Path | None = None) -> KnowledgeData:
-    """Load all four UTF-8 documents, either from a checkout or an installed wheel."""
+    """Load all five UTF-8 documents, either from a checkout or an installed wheel."""
     if knowledge_dir is not None:
         root = Path(knowledge_dir)
     else:
@@ -36,6 +36,7 @@ def load_knowledge(knowledge_dir: str | Path | None = None) -> KnowledgeData:
         ("五行", "five_elements.yaml"),
         ("天干", "heavenly_stems.yaml"),
         ("地支", "earthly_branches.yaml"),
+        ("", "hidden_stems.yaml"),
     ):
         path = root.joinpath(folder, filename)
         document = yaml.load(path.read_text(encoding="utf-8"), Loader=_UniqueKeyLoader)
@@ -62,6 +63,22 @@ class KnowledgeBase:
             if record.char == char:
                 return record
         raise KeyError(f"Unknown earthly branch: {char!r}")
+
+    def get_hidden_stems(self, branch: str) -> list[HeavenlyStem]:
+        """Resolve references in stored order; accept a branch character or ID."""
+        branch_record = next(
+            (record for record in self.data.earthly_branches
+             if branch in (record.char, record.id)),
+            None,
+        )
+        if branch_record is None:
+            raise KeyError(f"Unknown earthly branch: {branch!r}")
+        hidden = next(
+            record for record in self.data.hidden_stems
+            if record.branch_id == branch_record.id
+        )
+        stems_by_id = {record.id: record for record in self.data.heavenly_stems}
+        return [stems_by_id[stem_id] for stem_id in hidden.stem_ids]
 
     def _element_id(self, name_zh: str) -> str:
         for record in self.data.elements:
@@ -99,6 +116,10 @@ def get_heavenly_stem(char: str) -> HeavenlyStem:
 
 def get_earthly_branch(char: str) -> EarthlyBranch:
     return KnowledgeBase().get_earthly_branch(char)
+
+
+def get_hidden_stems(branch: str) -> list[HeavenlyStem]:
+    return KnowledgeBase().get_hidden_stems(branch)
 
 
 def get_generating_element(name_zh: str) -> str:
