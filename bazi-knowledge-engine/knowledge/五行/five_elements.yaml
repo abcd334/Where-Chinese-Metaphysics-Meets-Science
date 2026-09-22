@@ -1,0 +1,19 @@
+# Source: README.md — phase1-spec
+# order is the dataset's display order, not a relation computation rule.
+elements:
+  - {id: wood, name_zh: 木, order: 1}
+  - {id: fire, name_zh: 火, order: 2}
+  - {id: earth, name_zh: 土, order: 3}
+  - {id: metal, name_zh: 金, order: 4}
+  - {id: water, name_zh: 水, order: 5}
+relations:
+  - {source: wood, target: fire, relation: generates}
+  - {source: fire, target: earth, relation: generates}
+  - {source: earth, target: metal, relation: generates}
+  - {source: metal, target: water, relation: generates}
+  - {source: water, target: wood, relation: generates}
+  - {source: wood, target: earth, relation: controls}
+  - {source: earth, target: water, relation: controls}
+  - {source: water, target: fire, relation: controls}
+  - {source: fire, target: metal, relation: controls}
+  - {source: metal, target: wood, relation: controls}

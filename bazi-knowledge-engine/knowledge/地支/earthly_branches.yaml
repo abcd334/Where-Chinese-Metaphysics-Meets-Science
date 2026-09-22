@@ -1,0 +1,15 @@
+# Sources: README.md — phase1-spec, hko-order, ndl-elements, branch-polarity
+# yin_yang describes the branch itself; see README source-validation boundary.
+earthly_branches:
+  - {id: zi, char: 子, order: 1, yin_yang: yang, element: water}
+  - {id: chou, char: 丑, order: 2, yin_yang: yin, element: earth}
+  - {id: yin, char: 寅, order: 3, yin_yang: yang, element: wood}
+  - {id: mao, char: 卯, order: 4, yin_yang: yin, element: wood}
+  - {id: chen, char: 辰, order: 5, yin_yang: yang, element: earth}
+  - {id: si, char: 巳, order: 6, yin_yang: yin, element: fire}
+  - {id: wu, char: 午, order: 7, yin_yang: yang, element: fire}
+  - {id: wei, char: 未, order: 8, yin_yang: yin, element: earth}
+  - {id: shen, char: 申, order: 9, yin_yang: yang, element: metal}
+  - {id: you, char: 酉, order: 10, yin_yang: yin, element: metal}
+  - {id: xu, char: 戌, order: 11, yin_yang: yang, element: earth}
+  - {id: hai, char: 亥, order: 12, yin_yang: yin, element: water}

@@ -1,0 +1,12 @@
+# Sources: README.md — phase1-spec, hko-order, ndl-elements
+heavenly_stems:
+  - {id: jia, char: 甲, order: 1, yin_yang: yang, element: wood}
+  - {id: yi, char: 乙, order: 2, yin_yang: yin, element: wood}
+  - {id: bing, char: 丙, order: 3, yin_yang: yang, element: fire}
+  - {id: ding, char: 丁, order: 4, yin_yang: yin, element: fire}
+  - {id: wu, char: 戊, order: 5, yin_yang: yang, element: earth}
+  - {id: ji, char: 己, order: 6, yin_yang: yin, element: earth}
+  - {id: geng, char: 庚, order: 7, yin_yang: yang, element: metal}
+  - {id: xin, char: 辛, order: 8, yin_yang: yin, element: metal}
+  - {id: ren, char: 壬, order: 9, yin_yang: yang, element: water}
+  - {id: gui, char: 癸, order: 10, yin_yang: yin, element: water}
