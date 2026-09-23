@@ -1,0 +1,66 @@
+# 來源與驗證邊界
+
+[回文件導覽](../README.md) · [待辦清單](../TODO.md)
+
+來源是各層共用的資料品質要求。名稱、基本分類、教學說明、傳統對應與推導前提
+各自需要適當的依據，不能用一個來源替整筆記錄的所有內容背書。
+
+## 來源政策
+
+採用的基本分類與藏干表以使用者指定資料集為準。文獻提供指定範圍內的核對或概念背景；
+遇到不同分類、順序、土的季節配屬或氣分類，不自行選一套覆蓋現有資料。
+
+古籍使用公開文本轉錄；白話說明是本專案的教學改寫。
+來源中的占斷、倫理或其他敘述不因引用同一篇文章就自動納入。
+「文獻有記載」不等於已完成版本校勘、跨流派共識或現代科學驗證。
+
+## 基本資料的來源代號
+
+基本 YAML 檔首的代號對應下表。原基本資料的外部核對日期為 2026-09-22。
+
+| 檔首代號 | 來源與採用範圍 |
+| --- | --- |
+| `phase1-spec` | 使用者原基本資料規格：陰陽、五行名稱與順序、生剋邊、十干分類及指定地支驗收值；測試保存驗收對應。 |
+| `phase2-spec` | 使用者指定的十二地支藏干清單與順序；保存於 [hidden_stems.yaml](../knowledge/hidden_stems.yaml) 及 [test_hidden_stems.py](../tests/test_hidden_stems.py)。 |
+| `hko-order` | [香港天文台：天干和地支](https://www.hko.gov.hk/tc/gts/time/stemsandbranches.htm)，核對干支名稱、順序。 |
+| `ndl-elements` | [日本國立國會圖書館：干支①六十干支](https://www.ndl.go.jp/koyomi/chapter3/s1.html)，核對天干陰陽／五行及地支五行。 |
+| `branch-polarity` | [《三命通會》論支元六合網路轉錄](https://sajumania.com/ebook/to01-05/to01-05-02-21.htm)，只核對段首地支陰陽分類，不匯入該章的關係規則。 |
+
+**Requires source validation**：`branch-polarity` 尚須與指定古籍版本、頁碼覆核。
+不同文獻若用「地支陰陽」表示不同分類，需先確認定義與範圍，不得覆寫目前欄位。
+目前 `earthly_branches.yaml` 的陰陽指地支本身，五行指其本氣五行，不由藏干陰陽推導。
+
+## 可查詢說明的來源登錄
+
+完整 URL、章節定位、使用範圍及核對日期保存在
+[sources.yaml](../knowledge/concepts/sources.yaml)。該批記錄的核對日期為 2026-09-23。
+
+| 來源 ID | 使用範圍 |
+| --- | --- |
+| `concept_spec` | 使用者對元素白話說明、傳統象徵及內容邊界的要求；不是古籍來源。 |
+| `phase1_spec`、`phase2_spec` | 對應上述兩份使用者資料規格。 |
+| `yijing_xici` | 《易傳》繫辭上第五、六章的陰陽傳統語境。 |
+| `shangshu_hongfan` | 《尚書》洪範「一、五行」的名稱及曲直、炎上等描述。 |
+| `huainan_tianwen` | 《淮南子》天文訓中的五行、方向、四時與相生記載；不據此指定唯一土季。 |
+| `huainan_shize` | 《淮南子》時則訓中的孟仲季位置及季夏與土的記載。 |
+| `sanming_renyuan` | 《三命通會》卷二〈論人元司事〉中藏干與四時的語境及不同說法；不驗證現有清單的全部順序或成因。 |
+| `hko_order`、`ndl_elements` | 對應上述公開干支分類資料。 |
+
+檔首代號使用連字號，程式來源 ID 使用底線，保留既有命名以避免破壞引用。
+`phase1`／`phase2` 表示原始規格來源，不是現在的架構層名稱。
+基本資料目前採檔案註解追溯；可查詢說明與季節資料則有逐項 `source_ids`。
+
+## 來源狀態
+
+| `source_status.value` | 意義 |
+| --- | --- |
+| `source_attested` | 已核對指定文本或使用者規格中的這項記載；不是對自然因果的驗證。 |
+| `traditional_common` | 採用的傳統概念教學改寫，附所依據的參考及使用者規格。 |
+| `requires_validation` | 版本、框架或推導前提尚未確認，不提升為固定規則。 |
+| `derived_from_facts` | 由目前基本屬性產生的文字，例如甲的陰陽與五行介紹。 |
+
+每筆傳統對應都有自己的來源狀態；不能以元素說明的整體狀態取代個別對應的狀態。
+土的季夏記載與四季末／季節轉換說法分開保存，後者的整合與時間邊界仍待確認。
+
+**Hidden stem weighting and qi classification require separate source validation.**
+具體待核對項目集中於 [TODO](../TODO.md)，不以一般常識補成可執行的命理規則。

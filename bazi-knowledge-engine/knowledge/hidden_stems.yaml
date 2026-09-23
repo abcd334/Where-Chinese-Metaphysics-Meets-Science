@@ -1,4 +1,4 @@
-# Source: README.md — phase2-spec (user-supplied canonical dataset).
+# Source: docs/sources.md — phase2-spec (user-supplied canonical dataset).
 # List order is canonical ordering only, not weight or qi classification.
 hidden_stems:
   - branch_id: zi

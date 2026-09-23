@@ -1,4 +1,4 @@
-# Source: README.md — phase1-spec
+# Source: docs/sources.md — phase1-spec
 # order is the dataset's display order, not a relation computation rule.
 elements:
   - {id: wood, name_zh: 木, order: 1}

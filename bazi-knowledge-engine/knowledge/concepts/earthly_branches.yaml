@@ -1,0 +1,16 @@
+concepts:
+  - id: "earthly_branches"
+    name_zh: "地支"
+    short_definition: "子至亥十二個依次使用的傳統計序符號，有各自的分類與關係。"
+    plain_explanation: "十二地支是子、丑、寅、卯、辰、巳、午、未、申、酉、戌、亥。地支與天干是兩套不同長度的符號系統，不是同一張表的兩種寫法。地支的五行分類、季節位置與所含藏干是不同關係，應分開查詢。"
+    traditional_associations: []
+    notes:
+      - "字形相同或五行相同不表示天干與地支是同一實體。"
+    source_ids:
+      - "phase1_spec"
+      - "hko_order"
+      - "ndl_elements"
+      - "concept_spec"
+    source_status:
+      value: "traditional_common"
+      note: "傳統概念的教學改寫；僅說明所採框架，不是自然科學定律或個人預測。"

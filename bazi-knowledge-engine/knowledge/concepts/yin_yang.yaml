@@ -1,0 +1,45 @@
+concepts:
+  - id: "yin_yang"
+    name_zh: "陰陽"
+    short_definition: "傳統思想中用來描述相對面向及其變化的一對分類。"
+    plain_explanation: "陰與陽要放在同一比較範圍理解；它們不等於好與壞，也不直接指定人的性別或個性。五行提供五種分類，陰陽提供另一個分類面向；天干把兩者配在同一套符號中。"
+    traditional_associations: []
+    notes:
+      - "陰陽分類與五行分類分開儲存；本系統不從其中一項自動推斷另一項。"
+    source_ids:
+      - "yijing_xici"
+      - "concept_spec"
+      - "ndl_elements"
+    source_status:
+      value: "traditional_common"
+      note: "傳統概念的教學改寫；僅說明所採框架，不是自然科學定律或個人預測。"
+  - id: "yin"
+    name_zh: "陰"
+    short_definition: "與陽相對、必須依比較情境理解的傳統分類。"
+    plain_explanation: "「陰」只有相對於「陽」及具體比較面向時才有意義。天干中的 yin 是已記錄的符號屬性，並非對該符號或人的價值評分。"
+    traditional_associations: []
+    notes: []
+    source_ids:
+      - "yijing_xici"
+      - "concept_spec"
+    source_status:
+      value: "traditional_common"
+      note: "傳統概念的教學改寫；僅說明所採框架，不是自然科學定律或個人預測。"
+    fact_ref:
+      collection: "yin_yang"
+      id: "yin"
+  - id: "yang"
+    name_zh: "陽"
+    short_definition: "與陰相對、必須依比較情境理解的傳統分類。"
+    plain_explanation: "「陽」與「陰」成對使用。說天干屬陽，是指資料表中的陰陽分類；單憑這個分類不會產生好壞、能力或人的特質結論。"
+    traditional_associations: []
+    notes: []
+    source_ids:
+      - "yijing_xici"
+      - "concept_spec"
+    source_status:
+      value: "traditional_common"
+      note: "傳統概念的教學改寫；僅說明所採框架，不是自然科學定律或個人預測。"
+    fact_ref:
+      collection: "yin_yang"
+      id: "yang"

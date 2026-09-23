@@ -20,7 +20,7 @@ packages = ["src/bazi_knowledge"]
 knowledge = "bazi_knowledge/knowledge"
 
 [tool.hatch.build.targets.sdist]
-include = ["/README.md", "/pyproject.toml", "/knowledge", "/src", "/tests"]
+include = ["/README.md", "/TODO.md", "/pyproject.toml", "/docs", "/knowledge", "/src", "/tests", "/examples"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

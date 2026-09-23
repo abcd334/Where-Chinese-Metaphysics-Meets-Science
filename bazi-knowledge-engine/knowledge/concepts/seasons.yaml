@@ -1,0 +1,118 @@
+seasons:
+  - id: "spring"
+    name_zh: "春"
+  - id: "summer"
+    name_zh: "夏"
+  - id: "autumn"
+    name_zh: "秋"
+  - id: "winter"
+    name_zh: "冬"
+branch_seasons:
+  - branch_id: "yin"
+    season_id: "spring"
+    stage: "孟"
+    scope: "《淮南子》時則訓的孟春月序位置；只查符號關聯，不換算日期。"
+    source_ids:
+      - "huainan_shize"
+    source_status:
+      value: "source_attested"
+      note: "已核對該季節段落與地支的對應。"
+  - branch_id: "mao"
+    season_id: "spring"
+    stage: "仲"
+    scope: "《淮南子》時則訓的仲春月序位置；只查符號關聯，不換算日期。"
+    source_ids:
+      - "huainan_shize"
+    source_status:
+      value: "source_attested"
+      note: "已核對該季節段落與地支的對應。"
+  - branch_id: "chen"
+    season_id: "spring"
+    stage: "季"
+    scope: "《淮南子》時則訓的季春月序位置；只查符號關聯，不換算日期。"
+    source_ids:
+      - "huainan_shize"
+    source_status:
+      value: "source_attested"
+      note: "已核對該季節段落與地支的對應。"
+  - branch_id: "si"
+    season_id: "summer"
+    stage: "孟"
+    scope: "《淮南子》時則訓的孟夏月序位置；只查符號關聯，不換算日期。"
+    source_ids:
+      - "huainan_shize"
+    source_status:
+      value: "source_attested"
+      note: "已核對該季節段落與地支的對應。"
+  - branch_id: "wu"
+    season_id: "summer"
+    stage: "仲"
+    scope: "《淮南子》時則訓的仲夏月序位置；只查符號關聯，不換算日期。"
+    source_ids:
+      - "huainan_shize"
+    source_status:
+      value: "source_attested"
+      note: "已核對該季節段落與地支的對應。"
+  - branch_id: "wei"
+    season_id: "summer"
+    stage: "季"
+    scope: "《淮南子》時則訓的季夏月序位置；只查符號關聯，不換算日期。"
+    source_ids:
+      - "huainan_shize"
+    source_status:
+      value: "source_attested"
+      note: "已核對該季節段落與地支的對應。"
+  - branch_id: "shen"
+    season_id: "autumn"
+    stage: "孟"
+    scope: "《淮南子》時則訓的孟秋月序位置；只查符號關聯，不換算日期。"
+    source_ids:
+      - "huainan_shize"
+    source_status:
+      value: "source_attested"
+      note: "已核對該季節段落與地支的對應。"
+  - branch_id: "you"
+    season_id: "autumn"
+    stage: "仲"
+    scope: "《淮南子》時則訓的仲秋月序位置；只查符號關聯，不換算日期。"
+    source_ids:
+      - "huainan_shize"
+    source_status:
+      value: "source_attested"
+      note: "已核對該季節段落與地支的對應。"
+  - branch_id: "xu"
+    season_id: "autumn"
+    stage: "季"
+    scope: "《淮南子》時則訓的季秋月序位置；只查符號關聯，不換算日期。"
+    source_ids:
+      - "huainan_shize"
+    source_status:
+      value: "source_attested"
+      note: "已核對該季節段落與地支的對應。"
+  - branch_id: "hai"
+    season_id: "winter"
+    stage: "孟"
+    scope: "《淮南子》時則訓的孟冬月序位置；只查符號關聯，不換算日期。"
+    source_ids:
+      - "huainan_shize"
+    source_status:
+      value: "source_attested"
+      note: "已核對該季節段落與地支的對應。"
+  - branch_id: "zi"
+    season_id: "winter"
+    stage: "仲"
+    scope: "《淮南子》時則訓的仲冬月序位置；只查符號關聯，不換算日期。"
+    source_ids:
+      - "huainan_shize"
+    source_status:
+      value: "source_attested"
+      note: "已核對該季節段落與地支的對應。"
+  - branch_id: "chou"
+    season_id: "winter"
+    stage: "季"
+    scope: "《淮南子》時則訓的季冬月序位置；只查符號關聯，不換算日期。"
+    source_ids:
+      - "huainan_shize"
+    source_status:
+      value: "source_attested"
+      note: "已核對該季節段落與地支的對應。"

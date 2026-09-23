@@ -1,0 +1,289 @@
+concepts:
+  - id: "five_elements"
+    name_zh: "五行"
+    short_definition: "以木、火、土、金、水組織傳統分類與對應關係的概念框架。"
+    plain_explanation: "五行名稱借用熟悉的事物，卻不只表示五種實體材料；傳統文本也用它們組織性質、季節及方向。這是特定文化框架，不是現代化學元素表。概念說明、象徵對應及生剋資料各有不同欄位。"
+    traditional_associations: []
+    notes: []
+    source_ids:
+      - "shangshu_hongfan"
+      - "huainan_tianwen"
+      - "concept_spec"
+    source_status:
+      value: "traditional_common"
+      note: "傳統概念的教學改寫；僅說明所採框架，不是自然科學定律或個人預測。"
+  - id: "wood"
+    name_zh: "木"
+    short_definition: "傳統五行之一，本層以生長、萌發與伸展等意象說明。"
+    plain_explanation: "用植物生長及枝條伸展作為理解分類的比喻，不只指一棵實際的樹。"
+    traditional_associations:
+      - kind: "symbol"
+        value: "生長、萌發與伸展"
+        scope: "使用者規格指定的傳統象徵教學摘要；不視為古籍逐字定義。"
+        source_ids:
+          - "concept_spec"
+        source_status:
+          value: "traditional_common"
+          note: "傳統概念的教學改寫；僅說明所採框架，不是自然科學定律或個人預測。"
+      - kind: "symbol"
+        value: "曲直"
+        scope: "《尚書》洪範的五行描述；保留詞語並以白話說明，不延伸到人格。"
+        source_ids:
+          - "shangshu_hongfan"
+        source_status:
+          value: "source_attested"
+          note: "已核對指定文獻中的此項對應；不是對自然因果的驗證。"
+      - kind: "direction"
+        value: "東"
+        scope: "傳統五行方位對應；中央不表示地理上的第五個羅盤方向。"
+        source_ids:
+          - "huainan_tianwen"
+        source_status:
+          value: "source_attested"
+          note: "已核對指定文獻中的此項對應；不是對自然因果的驗證。"
+      - kind: "season"
+        value: "春"
+        scope: "《淮南子》天文訓的五行四時對應；不是任何地點的即時氣候判定。"
+        source_ids:
+          - "huainan_tianwen"
+        source_status:
+          value: "source_attested"
+          note: "已核對指定文獻中的此項對應；不是對自然因果的驗證。"
+    notes:
+      - "象徵敘述不是基本屬性，也不代表個人特質。"
+    source_ids:
+      - "shangshu_hongfan"
+      - "concept_spec"
+    source_status:
+      value: "traditional_common"
+      note: "傳統概念的教學改寫；僅說明所採框架，不是自然科學定律或個人預測。"
+    fact_ref:
+      collection: "elements"
+      id: "wood"
+  - id: "fire"
+    name_zh: "火"
+    short_definition: "傳統五行之一，本層以上升、發散與溫熱等意象說明。"
+    plain_explanation: "用火焰向上及熱向外傳散作為理解分類的比喻；此處不建立物理因果公式。"
+    traditional_associations:
+      - kind: "symbol"
+        value: "上升、發散與溫熱"
+        scope: "使用者規格指定的傳統象徵教學摘要；不視為古籍逐字定義。"
+        source_ids:
+          - "concept_spec"
+        source_status:
+          value: "traditional_common"
+          note: "傳統概念的教學改寫；僅說明所採框架，不是自然科學定律或個人預測。"
+      - kind: "symbol"
+        value: "炎上"
+        scope: "《尚書》洪範的五行描述；保留詞語並以白話說明，不延伸到人格。"
+        source_ids:
+          - "shangshu_hongfan"
+        source_status:
+          value: "source_attested"
+          note: "已核對指定文獻中的此項對應；不是對自然因果的驗證。"
+      - kind: "direction"
+        value: "南"
+        scope: "傳統五行方位對應；中央不表示地理上的第五個羅盤方向。"
+        source_ids:
+          - "huainan_tianwen"
+        source_status:
+          value: "source_attested"
+          note: "已核對指定文獻中的此項對應；不是對自然因果的驗證。"
+      - kind: "season"
+        value: "夏"
+        scope: "《淮南子》天文訓的五行四時對應；不是任何地點的即時氣候判定。"
+        source_ids:
+          - "huainan_tianwen"
+        source_status:
+          value: "source_attested"
+          note: "已核對指定文獻中的此項對應；不是對自然因果的驗證。"
+    notes:
+      - "象徵敘述不是基本屬性，也不代表個人特質。"
+    source_ids:
+      - "shangshu_hongfan"
+      - "concept_spec"
+    source_status:
+      value: "traditional_common"
+      note: "傳統概念的教學改寫；僅說明所採框架，不是自然科學定律或個人預測。"
+    fact_ref:
+      collection: "elements"
+      id: "fire"
+  - id: "earth"
+    name_zh: "土"
+    short_definition: "傳統五行之一，本層以承載、轉化與居中等意象說明。"
+    plain_explanation: "用土地承接、培育作物與居中的意象理解分類；這些是教學用語。土的季節配屬有不同框架，不能壓成一個沒有條件的答案。"
+    traditional_associations:
+      - kind: "symbol"
+        value: "承載、轉化與居中"
+        scope: "使用者規格指定的傳統象徵教學摘要；不視為古籍逐字定義。"
+        source_ids:
+          - "concept_spec"
+        source_status:
+          value: "traditional_common"
+          note: "傳統概念的教學改寫；僅說明所採框架，不是自然科學定律或個人預測。"
+      - kind: "symbol"
+        value: "稼穡"
+        scope: "《尚書》洪範的五行描述；保留詞語並以白話說明，不延伸到人格。"
+        source_ids:
+          - "shangshu_hongfan"
+        source_status:
+          value: "source_attested"
+          note: "已核對指定文獻中的此項對應；不是對自然因果的驗證。"
+      - kind: "direction"
+        value: "中央"
+        scope: "傳統五行方位對應；中央不表示地理上的第五個羅盤方向。"
+        source_ids:
+          - "huainan_tianwen"
+        source_status:
+          value: "source_attested"
+          note: "已核對指定文獻中的此項對應；不是對自然因果的驗證。"
+      - kind: "season"
+        value: "季夏"
+        scope: "《淮南子》時則訓的季夏段與土並列；只指該框架中的夏季末段，不等於土唯一對應整個夏季。"
+        source_ids:
+          - "huainan_shize"
+        source_status:
+          value: "source_attested"
+          note: "已核對指定文獻中的此項對應；不是對自然因果的驗證。"
+      - kind: "season"
+        value: "四季末／季節轉換"
+        scope: "另一種將土放在各季末段的說明；與季夏說如何整合、時間邊界如何界定，另待核對。"
+        source_ids:
+          - "sanming_renyuan"
+          - "concept_spec"
+        source_status:
+          value: "requires_validation"
+          note: "文獻存在不同配屬語境；尚未選定統一的時間規則。"
+    notes:
+      - "季夏與各季末段分別保存，不以其中一說覆蓋另一說。"
+    source_ids:
+      - "shangshu_hongfan"
+      - "concept_spec"
+    source_status:
+      value: "traditional_common"
+      note: "傳統概念的教學改寫；僅說明所採框架，不是自然科學定律或個人預測。"
+    fact_ref:
+      collection: "elements"
+      id: "earth"
+  - id: "metal"
+    name_zh: "金"
+    short_definition: "傳統五行之一，本層以收斂、凝聚與肅降等意象說明。"
+    plain_explanation: "這些是本專案採用的傳統象徵性教學用語，不是金屬的完整物理性質。《洪範》的從革另指順應改變，不能把後世象徵全當成該句的字面原意。"
+    traditional_associations:
+      - kind: "symbol"
+        value: "收斂、凝聚與肅降"
+        scope: "使用者規格指定的傳統象徵教學摘要；不視為古籍逐字定義。"
+        source_ids:
+          - "concept_spec"
+        source_status:
+          value: "traditional_common"
+          note: "傳統概念的教學改寫；僅說明所採框架，不是自然科學定律或個人預測。"
+      - kind: "symbol"
+        value: "從革"
+        scope: "《尚書》洪範的五行描述；保留詞語並以白話說明，不延伸到人格。"
+        source_ids:
+          - "shangshu_hongfan"
+        source_status:
+          value: "source_attested"
+          note: "已核對指定文獻中的此項對應；不是對自然因果的驗證。"
+      - kind: "direction"
+        value: "西"
+        scope: "傳統五行方位對應；中央不表示地理上的第五個羅盤方向。"
+        source_ids:
+          - "huainan_tianwen"
+        source_status:
+          value: "source_attested"
+          note: "已核對指定文獻中的此項對應；不是對自然因果的驗證。"
+      - kind: "season"
+        value: "秋"
+        scope: "《淮南子》天文訓的五行四時對應；不是任何地點的即時氣候判定。"
+        source_ids:
+          - "huainan_tianwen"
+        source_status:
+          value: "source_attested"
+          note: "已核對指定文獻中的此項對應；不是對自然因果的驗證。"
+    notes:
+      - "象徵敘述不是基本屬性，也不代表個人特質。"
+    source_ids:
+      - "shangshu_hongfan"
+      - "concept_spec"
+    source_status:
+      value: "traditional_common"
+      note: "傳統概念的教學改寫；僅說明所採框架，不是自然科學定律或個人預測。"
+    fact_ref:
+      collection: "elements"
+      id: "metal"
+  - id: "water"
+    name_zh: "水"
+    short_definition: "傳統五行之一，本層以流動、下降與收藏等意象說明。"
+    plain_explanation: "用水的流動、向下及冬季收藏的意象理解分類；物質特性與季節意象是不同對應，不由它們推論人的特質。"
+    traditional_associations:
+      - kind: "symbol"
+        value: "流動、下降與收藏"
+        scope: "使用者規格指定的傳統象徵教學摘要；不視為古籍逐字定義。"
+        source_ids:
+          - "concept_spec"
+        source_status:
+          value: "traditional_common"
+          note: "傳統概念的教學改寫；僅說明所採框架，不是自然科學定律或個人預測。"
+      - kind: "symbol"
+        value: "潤下"
+        scope: "《尚書》洪範的五行描述；保留詞語並以白話說明，不延伸到人格。"
+        source_ids:
+          - "shangshu_hongfan"
+        source_status:
+          value: "source_attested"
+          note: "已核對指定文獻中的此項對應；不是對自然因果的驗證。"
+      - kind: "direction"
+        value: "北"
+        scope: "傳統五行方位對應；中央不表示地理上的第五個羅盤方向。"
+        source_ids:
+          - "huainan_tianwen"
+        source_status:
+          value: "source_attested"
+          note: "已核對指定文獻中的此項對應；不是對自然因果的驗證。"
+      - kind: "season"
+        value: "冬"
+        scope: "《淮南子》天文訓的五行四時對應；不是任何地點的即時氣候判定。"
+        source_ids:
+          - "huainan_tianwen"
+        source_status:
+          value: "source_attested"
+          note: "已核對指定文獻中的此項對應；不是對自然因果的驗證。"
+    notes:
+      - "象徵敘述不是基本屬性，也不代表個人特質。"
+    source_ids:
+      - "shangshu_hongfan"
+      - "huainan_shize"
+      - "concept_spec"
+    source_status:
+      value: "traditional_common"
+      note: "傳統概念的教學改寫；僅說明所採框架，不是自然科學定律或個人預測。"
+    fact_ref:
+      collection: "elements"
+      id: "water"
+  - id: "generates"
+    name_zh: "相生"
+    short_definition: "五行系統中用來表示生發、滋養或承接的一種有向關係模式。"
+    plain_explanation: "相生是傳統關係名稱，不等於物質必然製造另一種物質，也不是好壞判斷。要查哪個五行生哪個五行，使用既有 Fact 關係資料；這裡不再存一份對應表。"
+    traditional_associations: []
+    notes: []
+    source_ids:
+      - "phase1_spec"
+      - "huainan_tianwen"
+      - "concept_spec"
+    source_status:
+      value: "traditional_common"
+      note: "傳統概念的教學改寫；僅說明所採框架，不是自然科學定律或個人預測。"
+  - id: "controls"
+    name_zh: "相剋"
+    short_definition: "五行系統中用來表示制約或限制的一種有向關係模式。"
+    plain_explanation: "相剋描述所採分類系統中的制約關係，並不自動表示傷害或不吉。生與剋要與後續條件判斷分開；此處只解釋術語，具體方向仍由 Fact YAML 查詢。"
+    traditional_associations: []
+    notes: []
+    source_ids:
+      - "phase1_spec"
+      - "concept_spec"
+    source_status:
+      value: "traditional_common"
+      note: "傳統概念的教學改寫；僅說明所採框架，不是自然科學定律或個人預測。"

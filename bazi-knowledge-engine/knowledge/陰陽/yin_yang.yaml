@@ -1,4 +1,4 @@
-# Source: README.md — phase1-spec
+# Source: docs/sources.md — phase1-spec
 yin_yang:
   - {id: yin, name_zh: 陰}
   - {id: yang, name_zh: 陽}

@@ -1,0 +1,30 @@
+concepts:
+  - id: "hidden_stems"
+    name_zh: "藏干"
+    short_definition: "本資料集中，一個地支對應的一組有序天干 reference。"
+    plain_explanation: "查詢藏干先讀取地支對應的天干 ID，再取得各天干的基本屬性。清單的存在與順序採使用者 Phase 2 指定資料；不由地支表面五行、陰陽或季節重新生成。"
+    traditional_associations: []
+    notes: []
+    source_ids:
+      - "phase2_spec"
+    source_status:
+      value: "source_attested"
+      note: "已核對使用者指定的 canonical dataset；不是宣稱所有文獻一致。"
+  - id: "hidden_stems_seasons"
+    name_zh: "藏干與四季"
+    short_definition: "藏干具有四時語境；目前可串接季節對應，完整藏干表的成因推導尚待驗證。"
+    plain_explanation: "《三命通會》論人元司事將支中所藏置於十二月與四時的論述中，也並列不同安排。本系統因此保存這項文獻關聯，並可查出地支的季節位置、它已記錄的藏干，以及每個藏干五行的季節對應。這條查詢鏈由既有資料串接而成，不表示四季可以唯一推出藏干的成員與順序。"
+    traditional_associations: []
+    notes:
+      - "reference_join 是可重現的資料串接，不是藏干表的生成公式或因果證明。"
+      - "季節位置僅限傳統月序語境；不能由年支、日支或時支單獨判定出生季節。"
+      - "季春的辰與土的基本分類並不矛盾：月份位置與五行分類是不同關係。"
+      - "本篇不同安排與現有 canonical 藏干表並不完全相同；不匯入分日數、不改寫現有清單。"
+      - "Hidden stem weighting and qi classification require separate source validation."
+    source_ids:
+      - "sanming_renyuan"
+      - "huainan_shize"
+      - "phase2_spec"
+    source_status:
+      value: "requires_validation"
+      note: "文獻中的季節關聯已找到；把完整 canonical 藏干表從季節唯一推導出來，仍 Requires source validation。"

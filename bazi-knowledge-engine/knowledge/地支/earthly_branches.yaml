@@ -1,5 +1,5 @@
-# Sources: README.md — phase1-spec, hko-order, ndl-elements, branch-polarity
-# yin_yang describes the branch itself; see README source-validation boundary.
+# Sources: docs/sources.md — phase1-spec, hko-order, ndl-elements, branch-polarity
+# yin_yang describes the branch itself; see docs/sources.md for validation boundaries.
 earthly_branches:
   - {id: zi, char: 子, order: 1, yin_yang: yang, element: water}
   - {id: chou, char: 丑, order: 2, yin_yang: yin, element: earth}

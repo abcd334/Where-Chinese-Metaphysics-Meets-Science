@@ -1,13 +1,15 @@
 """Validated basic data only; no derived attributes or interpretation."""
 
+from datetime import date
 from typing import Annotated, Literal, Self
 
-from pydantic import BaseModel, ConfigDict, Field, StrictInt, model_validator
+from pydantic import BaseModel, ConfigDict, Field, HttpUrl, StrictInt, StringConstraints, model_validator
 
 Identifier = Annotated[str, Field(pattern=r"^[a-z][a-z0-9_]*$")]
 Character = Annotated[str, Field(min_length=1, max_length=1)]
 Order = Annotated[StrictInt, Field(ge=1)]
 RelationType = Literal["generates", "controls"]
+Text = Annotated[str, StringConstraints(strip_whitespace=True, min_length=1)]
 
 
 class DataModel(BaseModel):
@@ -118,3 +120,142 @@ class KnowledgeData(DataModel):
         if seen_branches != branch_ids:
             raise ValueError("hidden_stems: every earthly branch needs a mapping")
         return self
+
+
+class SourceStatus(DataModel):
+    value: Literal["source_attested", "traditional_common", "requires_validation", "derived_from_facts"]
+    note: Text
+
+
+class Source(DataModel):
+    id: Identifier
+    title: Text
+    url: HttpUrl | None
+    locator: Text
+    scope: Text
+    checked_on: date
+
+
+class FactReference(DataModel):
+    collection: Literal["yin_yang", "elements", "heavenly_stems", "earthly_branches"]
+    id: Identifier
+
+
+class TraditionalAssociation(DataModel):
+    kind: Literal["symbol", "season", "direction"]
+    value: Text
+    scope: Text
+    source_ids: tuple[Identifier, ...] = Field(min_length=1)
+    source_status: SourceStatus
+
+
+class Concept(DataModel):
+    id: Identifier
+    name_zh: Text
+    fact_ref: FactReference | None = None
+    short_definition: Text
+    plain_explanation: Text
+    traditional_associations: tuple[TraditionalAssociation, ...] = ()
+    notes: tuple[Text, ...] = ()
+    source_ids: tuple[Identifier, ...] = Field(min_length=1)
+    source_status: SourceStatus
+
+
+class Season(DataModel):
+    id: Literal["spring", "summer", "autumn", "winter"]
+    name_zh: Character
+
+
+class BranchSeason(DataModel):
+    branch_id: Identifier
+    season_id: Identifier
+    stage: Literal["孟", "仲", "季"]
+    scope: Text
+    source_ids: tuple[Identifier, ...] = Field(min_length=1)
+    source_status: SourceStatus
+
+
+class ConceptData(DataModel):
+    """A separate schema sharing the same base models and YAML loader as facts."""
+
+    concepts: tuple[Concept, ...] = Field(min_length=1)
+    sources: tuple[Source, ...] = Field(min_length=1)
+    seasons: tuple[Season, ...] = Field(min_length=4, max_length=4)
+    branch_seasons: tuple[BranchSeason, ...] = Field(min_length=12, max_length=12)
+
+    @model_validator(mode="after")
+    def validate_references(self) -> Self:
+        for name in ("concepts", "sources", "seasons"):
+            records = getattr(self, name)
+            if len({record.id for record in records}) != len(records):
+                raise ValueError(f"{name}: duplicate id")
+        lookup_keys = [key for concept in self.concepts for key in (concept.id, concept.name_zh)]
+        if len(set(lookup_keys)) != len(lookup_keys):
+            raise ValueError("concepts: ambiguous id or name_zh")
+        source_ids = {source.id for source in self.sources}
+        season_ids = {season.id for season in self.seasons}
+        for record in (*self.concepts, *self.branch_seasons):
+            if not set(record.source_ids) <= source_ids:
+                raise ValueError("unknown source reference")
+        for concept in self.concepts:
+            for association in concept.traditional_associations:
+                if not set(association.source_ids) <= source_ids:
+                    raise ValueError("unknown association source reference")
+        for record in self.branch_seasons:
+            if record.season_id not in season_ids:
+                raise ValueError("unknown season reference")
+        if len({record.branch_id for record in self.branch_seasons}) != len(self.branch_seasons):
+            raise ValueError("duplicate seasonal branch reference")
+        if len({(r.season_id, r.stage) for r in self.branch_seasons}) != 12:
+            raise ValueError("each season needs unique 孟/仲/季 positions")
+        return self
+
+    def validate_against(self, facts: KnowledgeData) -> Self:
+        branch_ids = {branch.id for branch in facts.earthly_branches}
+        if {record.branch_id for record in self.branch_seasons} != branch_ids:
+            raise ValueError("seasonal mappings must cover exactly the known branches")
+        seen_refs = set()
+        for concept in self.concepts:
+            if concept.fact_ref is None:
+                continue
+            ref = concept.fact_ref
+            if ref.id not in {record.id for record in getattr(facts, ref.collection)}:
+                raise ValueError(f"unknown concept fact reference: {ref.collection}:{ref.id}")
+            key = (ref.collection, ref.id)
+            if key in seen_refs:
+                raise ValueError("duplicate concept fact reference")
+            seen_refs.add(key)
+        required_refs = {
+            (collection, record.id)
+            for collection in ("yin_yang", "elements")
+            for record in getattr(facts, collection)
+        }
+        if not required_refs <= seen_refs:
+            raise ValueError("every yin/yang and element needs a concept")
+        required = {"yin_yang", "five_elements", "generates", "controls",
+                    "heavenly_stems", "earthly_branches", "hidden_stems", "hidden_stems_seasons"}
+        if not required <= {concept.id for concept in self.concepts}:
+            raise ValueError("missing required overview concept")
+        return self
+
+
+class TraceStep(DataModel):
+    operation: Literal["lookup", "join"]
+    input_refs: tuple[Text, ...]
+    output_refs: tuple[Text, ...]
+    source_ids: tuple[Identifier, ...]
+
+
+class HiddenStemSeasonItem(DataModel):
+    stem: HeavenlyStem
+    element_concept: Concept
+
+
+class HiddenStemSeasonContext(DataModel):
+    derivation_kind: Literal["reference_join"] = "reference_join"
+    branch: EarthlyBranch
+    branch_season: BranchSeason
+    season: Season
+    hidden_stems: tuple[HiddenStemSeasonItem, ...]
+    explanation: Concept
+    trace: tuple[TraceStep, ...]

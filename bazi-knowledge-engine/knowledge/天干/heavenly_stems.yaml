@@ -1,4 +1,4 @@
-# Sources: README.md — phase1-spec, hko-order, ndl-elements
+# Sources: docs/sources.md — phase1-spec, hko-order, ndl-elements
 heavenly_stems:
   - {id: jia, char: 甲, order: 1, yin_yang: yang, element: wood}
   - {id: yi, char: 乙, order: 2, yin_yang: yin, element: wood}

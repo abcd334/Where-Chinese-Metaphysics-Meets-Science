@@ -1,0 +1,27 @@
+concepts:
+  - id: "heavenly_stems"
+    name_zh: "天干"
+    short_definition: "甲至癸十個依次使用的傳統計序符號，在本資料集中各有陰陽及五行分類。"
+    plain_explanation: "十天干是甲、乙、丙、丁、戊、己、庚、辛、壬、癸。現有配屬中，每種五行都有一個陽干和一個陰干，因此可以用五種分類加兩種面向理解十個位置；這是配屬方式的解釋，不是天干歷史起源的證明。各干的對應與分組由 Basic Data 查得。"
+    traditional_associations: []
+    notes:
+      - "甲像大樹、乙像藤蔓、丙像太陽、丁像燭火等象徵的版本與適用範圍：Requires source validation；目前不列為個別天干的固定對應。"
+    source_ids:
+      - "phase1_spec"
+      - "ndl_elements"
+      - "hko_order"
+    source_status:
+      value: "traditional_common"
+      note: "傳統概念的教學改寫；僅說明所採框架，不是自然科學定律或個人預測。"
+  - id: "stem_imagery"
+    name_zh: "天干取象"
+    short_definition: "個別天干與具體物象的對應，需要分別核對來源、版本與適用範圍。"
+    plain_explanation: "甲與大樹、乙與藤蔓、丙與太陽、丁與燭火等對應是待核對的象徵提案。本版不把這些提案列成各天干的固定屬性，也不據此推論個人特質。"
+    traditional_associations: []
+    notes:
+      - "Requires source validation；核對前不加入個別天干的 traditional_associations。"
+    source_ids:
+      - "concept_spec"
+    source_status:
+      value: "requires_validation"
+      note: "尚未逐項比對象徵的文獻版本；不能用一般印象補成固定對應。"
