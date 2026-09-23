@@ -95,6 +95,22 @@ class KnowledgeBase:
     def get_concept(self, key: str) -> Concept:
         for concept in self.concepts.concepts:
             if key in (concept.id, concept.name_zh):
+                if concept.fact_ref and concept.fact_ref.collection == "earthly_branches":
+                    branch = next(item for item in self.data.earthly_branches
+                                  if item.id == concept.fact_ref.id)
+                    element = next(item for item in self.data.elements if item.id == branch.element)
+                    polarity = next(item for item in self.data.yin_yang if item.id == branch.yin_yang)
+                    # Only the basic data supplies classification values; keep YAML provenance.
+                    return concept.model_copy(update={
+                        "short_definition": (
+                            f"{concept.short_definition}在本資料集中為第 {branch.order} 位，"
+                            f"分類為{polarity.name_zh}{element.name_zh}。"
+                        ),
+                        "plain_explanation": (
+                            f"在目前採用的基本分類中，{polarity.name_zh}是它的陰陽分類，"
+                            f"{element.name_zh}是它的五行分類。{concept.plain_explanation}"
+                        ),
+                    })
                 return concept
         # Stem definitions are rendered from facts, not a second mapping in YAML.
         for stem in self.data.heavenly_stems:

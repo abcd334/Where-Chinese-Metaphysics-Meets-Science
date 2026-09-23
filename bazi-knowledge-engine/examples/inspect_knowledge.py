@@ -17,6 +17,8 @@ def main():
         "wood": {"fact": wood.model_dump(), "concept": kb.get_concept("木").model_dump(mode="json")},
         "jia": {"fact": kb.get_heavenly_stem("甲").model_dump(),
                 "concept": kb.get_concept("甲").model_dump(mode="json")},
+        "yin_branch": {"fact": kb.get_earthly_branch("寅").model_dump(),
+                       "concept": kb.get_concept("寅").model_dump(mode="json")},
         "stems_by_element": tree,
         "chen_seasonal_context": kb.get_hidden_stem_season_context("辰").model_dump(mode="json"),
         "sources": [source.model_dump(mode="json") for source in kb.concepts.sources],

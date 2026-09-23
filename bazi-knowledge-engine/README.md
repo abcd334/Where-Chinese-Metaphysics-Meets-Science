@@ -1,12 +1,19 @@
 # 八字 Knowledge Engine
 
 這是一個機器可讀、可驗證、可追溯的八字知識庫，目前還不是算命程式。
-現在的重點是把**基礎元素的資料與白話說明整理完整**，讓沒有八字背景的人也能理解每個元素。
+**Layer 1 — Basic Elements**
+
+**Status: v1.0 complete**
+
+陰陽 2／2、五行 5／5、十天干 10／10、十二地支 12／12 均具備
+Basic Fact ＋ Plain Explanation ＋ Source / Validation Status。
+v1.0 凍結目前的基本分類、引用方式與查詢契約；待考據的來源狀態仍如實保留，
+不表示所有傳統說法已完成文獻驗證。後續變更須同步更新測試與文件。
 
 ## 四層架構
 
 ```text
-1. 基礎元素 ← 目前整理重點
+1. 基礎元素 — v1.0 complete
    陰陽、五行、天干、地支：基本屬性＋白話說明
         ↓ 被引用
 2. 關係／組合規則
@@ -58,11 +65,19 @@ from bazi_knowledge import KnowledgeBase
 kb = KnowledgeBase()
 assert kb.get_heavenly_stem("甲").element == "wood"
 assert kb.get_concept("甲").short_definition == "甲是十天干第 1 位，分類為陽木。"
+assert kb.get_concept("寅") == kb.get_concept("branch_yin")
+assert kb.get_concept("寅").fact_ref.id == "yin"
+assert "陽木" in kb.get_concept("寅").short_definition
 assert [stem.char for stem in kb.get_hidden_stems("寅")] == ["甲", "丙", "戊"]
 ```
 
 藏干只存天干引用；完整屬性由基本資料取得。季節查詢保留資料來源與查詢步驟，
 不宣稱四季可以唯一推導出完整藏干表。
 
-本次文件整理沿用現有 YAML、模型與 API。尚未加入排盤、日期換算、十神、
+個別地支說明只引用基本屬性，不帶入藏干、季節、組合或個人解讀。
+`get_concept("yin")` 仍指陰，`get_concept("wu")` 仍指戊；
+地支使用中文字或 `branch_` 前綴的說明 ID，避免不同集合的 ID 衝突。
+
+v1.0 驗收包含完整引用、來源狀態保留、說明跟隨基本 YAML、欄位限制與既有功能回歸。
+本次沿用現有 YAML 與模型，沒有新增第二層規則。尚未加入排盤、日期換算、十神、
 合沖刑害、個人命理解讀、資料庫、Web UI 或 LLM。

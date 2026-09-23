@@ -14,3 +14,123 @@ concepts:
     source_status:
       value: "traditional_common"
       note: "傳統概念的教學改寫；僅說明所採框架，不是自然科學定律或個人預測。"
+
+  - id: branch_zi
+    name_zh: 子
+    short_definition: "子是十二地支之一。"
+    plain_explanation: "子是地支系統中的符號；即使分類相同，地支與天干仍是不同的實體。這些分類描述符號的位置，不代表個人特質或命運。"
+    fact_ref: {collection: earthly_branches, id: zi}
+    source_ids: [phase1_spec, hko_order, ndl_elements, branch_polarity, concept_spec]
+    source_status:
+      value: requires_validation
+      note: "基本分類沿用目前資料集；陰陽分類的轉錄仍需與指定古籍版本及頁碼覆核。由基本資料組合文字不會解除此待驗證狀態。"
+
+  - id: branch_chou
+    name_zh: 丑
+    short_definition: "丑是十二地支之一。"
+    plain_explanation: "丑是地支系統中的符號；即使分類相同，地支與天干仍是不同的實體。這些分類描述符號的位置，不代表個人特質或命運。"
+    fact_ref: {collection: earthly_branches, id: chou}
+    source_ids: [phase1_spec, hko_order, ndl_elements, branch_polarity, concept_spec]
+    source_status:
+      value: requires_validation
+      note: "基本分類沿用目前資料集；陰陽分類的轉錄仍需與指定古籍版本及頁碼覆核。由基本資料組合文字不會解除此待驗證狀態。"
+
+  - id: branch_yin
+    name_zh: 寅
+    short_definition: "寅是十二地支之一。"
+    plain_explanation: "寅是地支系統中的符號；即使分類相同，地支與天干仍是不同的實體。這些分類描述符號的位置，不代表個人特質或命運。"
+    fact_ref: {collection: earthly_branches, id: yin}
+    source_ids: [phase1_spec, hko_order, ndl_elements, branch_polarity, concept_spec]
+    source_status:
+      value: requires_validation
+      note: "基本分類沿用目前資料集；陰陽分類的轉錄仍需與指定古籍版本及頁碼覆核。由基本資料組合文字不會解除此待驗證狀態。"
+
+  - id: branch_mao
+    name_zh: 卯
+    short_definition: "卯是十二地支之一。"
+    plain_explanation: "卯是地支系統中的符號；即使分類相同，地支與天干仍是不同的實體。這些分類描述符號的位置，不代表個人特質或命運。"
+    fact_ref: {collection: earthly_branches, id: mao}
+    source_ids: [phase1_spec, hko_order, ndl_elements, branch_polarity, concept_spec]
+    source_status:
+      value: requires_validation
+      note: "基本分類沿用目前資料集；陰陽分類的轉錄仍需與指定古籍版本及頁碼覆核。由基本資料組合文字不會解除此待驗證狀態。"
+
+  - id: branch_chen
+    name_zh: 辰
+    short_definition: "辰是十二地支之一。"
+    plain_explanation: "辰是地支系統中的符號；即使分類相同，地支與天干仍是不同的實體。這些分類描述符號的位置，不代表個人特質或命運。"
+    fact_ref: {collection: earthly_branches, id: chen}
+    source_ids: [phase1_spec, hko_order, ndl_elements, branch_polarity, concept_spec]
+    source_status:
+      value: requires_validation
+      note: "基本分類沿用目前資料集；陰陽分類的轉錄仍需與指定古籍版本及頁碼覆核。由基本資料組合文字不會解除此待驗證狀態。"
+
+  - id: branch_si
+    name_zh: 巳
+    short_definition: "巳是十二地支之一。"
+    plain_explanation: "巳是地支系統中的符號；即使分類相同，地支與天干仍是不同的實體。這些分類描述符號的位置，不代表個人特質或命運。"
+    fact_ref: {collection: earthly_branches, id: si}
+    source_ids: [phase1_spec, hko_order, ndl_elements, branch_polarity, concept_spec]
+    source_status:
+      value: requires_validation
+      note: "基本分類沿用目前資料集；陰陽分類的轉錄仍需與指定古籍版本及頁碼覆核。由基本資料組合文字不會解除此待驗證狀態。"
+
+  - id: branch_wu
+    name_zh: 午
+    short_definition: "午是十二地支之一。"
+    plain_explanation: "午是地支系統中的符號；即使分類相同，地支與天干仍是不同的實體。這些分類描述符號的位置，不代表個人特質或命運。"
+    fact_ref: {collection: earthly_branches, id: wu}
+    source_ids: [phase1_spec, hko_order, ndl_elements, branch_polarity, concept_spec]
+    source_status:
+      value: requires_validation
+      note: "基本分類沿用目前資料集；陰陽分類的轉錄仍需與指定古籍版本及頁碼覆核。由基本資料組合文字不會解除此待驗證狀態。"
+
+  - id: branch_wei
+    name_zh: 未
+    short_definition: "未是十二地支之一。"
+    plain_explanation: "未是地支系統中的符號；即使分類相同，地支與天干仍是不同的實體。這些分類描述符號的位置，不代表個人特質或命運。"
+    fact_ref: {collection: earthly_branches, id: wei}
+    source_ids: [phase1_spec, hko_order, ndl_elements, branch_polarity, concept_spec]
+    source_status:
+      value: requires_validation
+      note: "基本分類沿用目前資料集；陰陽分類的轉錄仍需與指定古籍版本及頁碼覆核。由基本資料組合文字不會解除此待驗證狀態。"
+
+  - id: branch_shen
+    name_zh: 申
+    short_definition: "申是十二地支之一。"
+    plain_explanation: "申是地支系統中的符號；即使分類相同，地支與天干仍是不同的實體。這些分類描述符號的位置，不代表個人特質或命運。"
+    fact_ref: {collection: earthly_branches, id: shen}
+    source_ids: [phase1_spec, hko_order, ndl_elements, branch_polarity, concept_spec]
+    source_status:
+      value: requires_validation
+      note: "基本分類沿用目前資料集；陰陽分類的轉錄仍需與指定古籍版本及頁碼覆核。由基本資料組合文字不會解除此待驗證狀態。"
+
+  - id: branch_you
+    name_zh: 酉
+    short_definition: "酉是十二地支之一。"
+    plain_explanation: "酉是地支系統中的符號；即使分類相同，地支與天干仍是不同的實體。這些分類描述符號的位置，不代表個人特質或命運。"
+    fact_ref: {collection: earthly_branches, id: you}
+    source_ids: [phase1_spec, hko_order, ndl_elements, branch_polarity, concept_spec]
+    source_status:
+      value: requires_validation
+      note: "基本分類沿用目前資料集；陰陽分類的轉錄仍需與指定古籍版本及頁碼覆核。由基本資料組合文字不會解除此待驗證狀態。"
+
+  - id: branch_xu
+    name_zh: 戌
+    short_definition: "戌是十二地支之一。"
+    plain_explanation: "戌是地支系統中的符號；即使分類相同，地支與天干仍是不同的實體。這些分類描述符號的位置，不代表個人特質或命運。"
+    fact_ref: {collection: earthly_branches, id: xu}
+    source_ids: [phase1_spec, hko_order, ndl_elements, branch_polarity, concept_spec]
+    source_status:
+      value: requires_validation
+      note: "基本分類沿用目前資料集；陰陽分類的轉錄仍需與指定古籍版本及頁碼覆核。由基本資料組合文字不會解除此待驗證狀態。"
+
+  - id: branch_hai
+    name_zh: 亥
+    short_definition: "亥是十二地支之一。"
+    plain_explanation: "亥是地支系統中的符號；即使分類相同，地支與天干仍是不同的實體。這些分類描述符號的位置，不代表個人特質或命運。"
+    fact_ref: {collection: earthly_branches, id: hai}
+    source_ids: [phase1_spec, hko_order, ndl_elements, branch_polarity, concept_spec]
+    source_status:
+      value: requires_validation
+      note: "基本分類沿用目前資料集；陰陽分類的轉錄仍需與指定古籍版本及頁碼覆核。由基本資料組合文字不會解除此待驗證狀態。"

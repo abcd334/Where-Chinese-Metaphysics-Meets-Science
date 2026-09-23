@@ -2,6 +2,10 @@
 
 [回文件導覽](../README.md) · [下一步：關係資料](relationships.md)
 
+**Layer 1 — Basic Elements · Status: v1.0 complete**
+
+本頁的 29 個基礎元素均有 Basic Fact、可查詢白話說明與 Source / Validation Status。
+
 這一頁先認識「零件」。每個名稱都有可供程式使用的基本屬性，也有給人閱讀的說明。
 這裡的「屬木」「屬陽」是本資料集採用的傳統分類，不是對人的性格描述。
 
@@ -87,6 +91,25 @@
 `甲` 是中文名稱，`jia` 是穩定識別碼。程式用 ID 引用其他記錄，避免重複儲存屬性。
 ID 只在同一集合中唯一：陰陽中的 `yin` 是陰，地支中的 `yin` 是寅；
 天干中的 `wu` 是戊，地支中的 `wu` 是午。查詢時要看 API 操作哪個集合。
+
+個別地支的說明 ID 統一加 `branch_` 前綴，因此既有陰陽與天干查詢不受影響：
+
+```python
+from bazi_knowledge import KnowledgeBase
+
+kb = KnowledgeBase()
+assert kb.get_concept("yin").name_zh == "陰"
+assert kb.get_concept("wu").name_zh == "戊"
+assert kb.get_concept("branch_yin") == kb.get_concept("寅")
+assert kb.get_concept("branch_wu") == kb.get_concept("午")
+assert kb.get_earthly_branch("寅").order == 3
+assert kb.get_concept("寅").short_definition == "寅是十二地支之一。在本資料集中為第 3 位，分類為陽木。"
+assert kb.get_concept("甲").short_definition == "甲是十天干第 1 位，分類為陽木。"
+```
+
+個別地支 YAML 只保存文字與引用，不另存順序、陰陽與五行，文字中的這些值由基本資料補入。
+地支說明的 `requires_validation` 表示原分類來源仍有古籍版本／頁碼覆核事項，
+不是查詢缺少資料；這項狀態不會因為產生說明文字而被改成已驗證。
 
 這一頁只把現有基本屬性說清楚。要回答「兩個元素有何關係」，再進入第二層；
 要回答「一張命盤有哪些結構」，則需要尚未實作的第三層。

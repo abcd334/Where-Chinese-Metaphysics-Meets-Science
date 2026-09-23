@@ -1,4 +1,10 @@
 sources:
+  - id: "branch_polarity"
+    title: "《三命通會》論支元六合網路轉錄（版本待覆核）"
+    url: "https://sajumania.com/ebook/to01-05/to01-05-02-21.htm"
+    locator: "段首地支陰陽分類；沿用 docs/sources.md 的 branch-polarity 紀錄"
+    scope: "僅追溯目前地支陰陽分類的既有轉錄來源；Requires source validation：指定古籍版本及頁碼尚待覆核，不匯入關係規則。"
+    checked_on: "2026-09-22"
   - id: "concept_spec"
     title: "使用者元素說明規格與四層架構整理要求"
     url: null

@@ -33,7 +33,8 @@
 ## 可查詢說明的來源登錄
 
 完整 URL、章節定位、使用範圍及核對日期保存在
-[sources.yaml](../knowledge/concepts/sources.yaml)。該批記錄的核對日期為 2026-09-23。
+[sources.yaml](../knowledge/concepts/sources.yaml)。原說明來源記錄的核對日期為 2026-09-23；
+新增登錄的 `branch_polarity` 沿用既有 2026-09-22 紀錄，沒有宣稱本次已重新完成外部版本核對。
 
 | 來源 ID | 使用範圍 |
 | --- | --- |
@@ -45,6 +46,7 @@
 | `huainan_shize` | 《淮南子》時則訓中的孟仲季位置及季夏與土的記載。 |
 | `sanming_renyuan` | 《三命通會》卷二〈論人元司事〉中藏干與四時的語境及不同說法；不驗證現有清單的全部順序或成因。 |
 | `hko_order`、`ndl_elements` | 對應上述公開干支分類資料。 |
+| `branch_polarity` | 對應既有 `branch-polarity`；把原文件中的待覆核來源登錄為可查詢引用。個別地支說明保留 `requires_validation`。 |
 
 檔首代號使用連字號，程式來源 ID 使用底線，保留既有命名以避免破壞引用。
 `phase1`／`phase2` 表示原始規格來源，不是現在的架構層名稱。
@@ -64,3 +66,6 @@
 
 **Hidden stem weighting and qi classification require separate source validation.**
 具體待核對項目集中於 [TODO](../TODO.md)，不以一般常識補成可執行的命理規則。
+
+Layer 1 v1.0 complete 表示已完整提供基本元素資料、說明與來源狀態，
+不表示所有來源已完成版本考據。產生或串接說明不會自動解除 `requires_validation`。

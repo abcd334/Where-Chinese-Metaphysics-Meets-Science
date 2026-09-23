@@ -45,6 +45,7 @@ Where Chinese Metaphysics Meets Science/
         ├── test_earthly_branches.py
         ├── test_hidden_stems.py
         ├── test_concepts.py
+        ├── test_layer1.py
         ├── test_seasonal_context.py
         └── test_loader.py
 ```
@@ -78,7 +79,7 @@ Wheel 包含 knowledge YAML，安裝後不依賴來源 checkout 的工作目錄�
 | `get_controlling_element` | 五行中文名 | 該五行所剋的五行中文名 |
 | `get_element_relation` | 來源、目標五行中文名 | `generates`、`controls` 或 `None` |
 | `get_hidden_stems` | 地支中文字或 ID | 有序 `list[HeavenlyStem]` |
-| `get_concept` | 說明 ID／中文名，或天干 ID／中文字 | `Concept` |
+| `get_concept` | 說明 ID／中文名、天干 ID／中文字、地支中文字或 `branch_` 說明 ID | `Concept` |
 | `get_hidden_stem_season_context` | 地支中文字或 ID | `HiddenStemSeasonContext` |
 
 ```python
@@ -106,9 +107,10 @@ assert kb.get_concept("甲").source_status.value == "derived_from_facts"
 物件可用屬性或 `.model_dump()` 讀取。未知輸入拋出 `KeyError`；只有合法五行間沒有直接邊時才回傳 `None`。
 藏干回傳新 list，其中元素直接引用已載入的不可變天干物件；修改 list 不會更改儲存的有序引用。
 
-說明查詢支援陰陽、五行、干支整體、相生／相剋、藏干與季節相關概念及十干個別介紹。
-目前 `get_concept("卯")` 不受支援；要取地支屬性請用 `get_earthly_branch("卯")`。
+說明查詢支援陰陽、五行、干支整體、相生／相剋、藏干與季節相關概念及二十二個干支的個別介紹。
+`get_concept("卯")` 與 `get_concept("branch_mao")` 都能查詢；基本屬性仍使用 `get_earthly_branch("卯")`。
 `get_concept("yin")` 是陰；`get_hidden_stems("yin")` 是寅的藏干。
+`get_concept("wu")` 仍是戊；地支說明一律用中文字或 `branch_` 前綴 ID，沒有新增裸地支 ID 別名。
 藏干 API 的 `wu` 指午，藏干清單裡的天干 ID `wu` 才指戊。
 
 季節 API 範例與推導界線見[關係資料](relationships.md)。回傳的 `trace` 是查詢紀錄：
@@ -176,8 +178,15 @@ Loader 保留清單順序，pytest 核對採用的完整對應與順序。不接
 各 association 分別保存適用範圍與來源狀態。十干個別介紹直接從目前基本屬性產生，
 不在說明 YAML 再存一份陰陽五行 mapping。
 
-`ConceptData` 合併七份說明資料，含 16 筆儲存的說明、10 筆來源、4 季及 12 筆地支季節位置。
-十干動態介紹不算在這 16 筆中。驗證包含 ID／名稱唯一、來源引用、基本資料引用與季節位置完整性。
+十二支個別記錄沿用相同 `Concept` schema，`id` 為 `branch_zi` 等，
+`fact_ref` 指向 `earthly_branches`。YAML 的定義與解釋只存不含分類值的文字；
+`get_concept()` 補上所引用基本資料的順序、陰陽與五行，不修改儲存的 Concept。
+因此 `load_concepts()` 提供原始說明，`get_concept()` 提供含基本分類的完整說明。
+查詢保留原 `source_ids` 與 `source_status`，不以 `derived_from_facts` 蓋掉地支的待驗證狀態。
+
+`ConceptData` 合併七份說明資料，含 28 筆儲存的說明、11 筆來源、4 季及 12 筆地支季節位置。
+十干動態介紹不算在這 28 筆中。驗證包含 ID／名稱唯一、來源引用、基本資料引用與季節位置完整性，
+並要求十二支說明全部有引用，且中文名與引用的地支一致。
 Schema 能檢查形狀和引用，不能自動判斷所有自然語言內容是否越界，文字仍需人工審閱。
 
 ## 載入與錯誤
@@ -208,4 +217,8 @@ Schema 能檢查形狀和引用，不能自動判斷所有自然語言內容是�
 測試會修改暫存 YAML，確認查詢跟隨資料，而不是依 Python 常數推算。
 
 修改資料時同時核對來源、引用與文件示例；新規則先寫清楚前提和範圍。
-先完善第一層說明與來源，後續功能見 [TODO](../TODO.md)。
+Layer 1 — Basic Elements 的 **Status: v1.0 complete** 是知識範圍及查詢契約的完成標記，
+不是整個 Python 套件的發行版本；`pyproject.toml` 版本不因此改成 1.0。
+`test_layer1.py` 驗收 29 個基本元素的說明、引用、來源、欄位與文字邊界；
+文字檢查是目前資料集的回歸保護，不是通用自然語言判讀器。
+待考據項目及後續建議見 [TODO](../TODO.md)。

@@ -219,19 +219,23 @@ class ConceptData(DataModel):
             if concept.fact_ref is None:
                 continue
             ref = concept.fact_ref
-            if ref.id not in {record.id for record in getattr(facts, ref.collection)}:
+            record = next((record for record in getattr(facts, ref.collection)
+                           if record.id == ref.id), None)
+            if record is None:
                 raise ValueError(f"unknown concept fact reference: {ref.collection}:{ref.id}")
+            if ref.collection == "earthly_branches" and concept.name_zh != record.char:
+                raise ValueError("earthly branch concept name must match its fact reference")
             key = (ref.collection, ref.id)
             if key in seen_refs:
                 raise ValueError("duplicate concept fact reference")
             seen_refs.add(key)
         required_refs = {
             (collection, record.id)
-            for collection in ("yin_yang", "elements")
+            for collection in ("yin_yang", "elements", "earthly_branches")
             for record in getattr(facts, collection)
         }
         if not required_refs <= seen_refs:
-            raise ValueError("every yin/yang and element needs a concept")
+            raise ValueError("every yin/yang, element and earthly branch needs a concept")
         required = {"yin_yang", "five_elements", "generates", "controls",
                     "heavenly_stems", "earthly_branches", "hidden_stems", "hidden_stems_seasons"}
         if not required <= {concept.id for concept in self.concepts}:
