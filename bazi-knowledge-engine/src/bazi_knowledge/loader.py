@@ -3,6 +3,7 @@
 from importlib.resources import files
 from functools import cached_property
 from pathlib import Path
+from typing import get_args
 
 import yaml
 
@@ -12,6 +13,7 @@ from .models import (
     SourceStatus, TraceStep,
     ElementRelation, TenGodData, TenGodElementRelation, TenGodResult, ReasoningStep,
     BranchTenGodResult, HiddenStemTenGodResult,
+    Pillar, PillarPosition, FourPillars, VisibleStemAnalysis, PillarAnalysis, FourPillarsAnalysis,
 )
 
 
@@ -324,6 +326,56 @@ class KnowledgeBase:
             sources=tuple(source for source in self.concepts.sources if source.id in source_ids),
         )
 
+    def analyze_four_pillars(
+        self, *, year: str, month: str, day: str, hour: str,
+    ) -> FourPillarsAnalysis:
+        """Compose existing rules for four caller-supplied pillars; no calendar validation."""
+        parsed = {}
+        for position, value in zip(get_args(PillarPosition), (year, month, day, hour), strict=True):
+            if not isinstance(value, str):
+                raise TypeError(f"{position}: pillar must be a Chinese stem/branch string")
+            if len(value) != 2:
+                raise ValueError(f"{position}: pillar must contain exactly two characters")
+            try:
+                parsed[position] = Pillar(stem=self.get_heavenly_stem(value[0]),
+                                          branch=self.get_earthly_branch(value[1]))
+            except KeyError as error:
+                raise ValueError(f"{position}: expected a known heavenly stem followed by an earthly branch") from error
+        # Validate all four inputs before running any Layer 2 analysis.
+        chart = FourPillars(**parsed)
+        master = chart.day.stem
+        trace = [TraceStep(
+            operation="lookup", input_refs=("chart:input",),
+            output_refs=tuple(f"pillars:{position}" for position in parsed), source_ids=(),
+        )]
+        trace.extend(TraceStep(
+            operation="lookup", input_refs=(f"pillars:{position}",),
+            output_refs=(f"heavenly_stems:{pillar.stem.id}", f"earthly_branches:{pillar.branch.id}"),
+            source_ids=(),
+        ) for position, pillar in parsed.items())
+        trace.append(TraceStep(
+            operation="lookup", input_refs=("pillars:day", f"heavenly_stems:{master.id}"),
+            output_refs=(f"day_master:{master.id}",), source_ids=(),
+        ))
+        analyses = []
+        sources = {}
+        for position, pillar in parsed.items():
+            visible_result = None if position == "day" else self.get_ten_god(master.id, pillar.stem.id)
+            branch_result = self.get_branch_ten_gods(master.id, pillar.branch.id)
+            analyses.append(PillarAnalysis(
+                position=position, pillar=pillar,
+                visible_stem_analysis=VisibleStemAnalysis(
+                    stem=pillar.stem, role="day_master" if position == "day" else "target",
+                    ten_god_result=visible_result,
+                ),
+                branch_analysis=branch_result,
+            ))
+            for result in (visible_result, branch_result):
+                if result is not None:
+                    sources.update((source.id, source) for source in result.sources)
+        return FourPillarsAnalysis(chart=chart, day_master=master, pillars=tuple(analyses),
+                                   trace=tuple(trace), sources=tuple(sources.values()))
+
     def _element_id(self, name_zh: str) -> str:
         for record in self.data.elements:
             if record.name_zh == name_zh:
@@ -364,6 +416,10 @@ def get_ten_god(day_master: str, target: str) -> TenGodResult:
 
 def get_branch_ten_gods(day_master: str, branch: str) -> BranchTenGodResult:
     return KnowledgeBase().get_branch_ten_gods(day_master, branch)
+
+
+def analyze_four_pillars(*, year: str, month: str, day: str, hour: str) -> FourPillarsAnalysis:
+    return KnowledgeBase().analyze_four_pillars(year=year, month=month, day=day, hour=hour)
 
 
 def classify_element_relation(day_master_element: str, target_element: str) -> TenGodElementRelation:

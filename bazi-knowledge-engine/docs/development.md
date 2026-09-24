@@ -16,13 +16,15 @@ Where Chinese Metaphysics Meets Science/
     ├── docs/
     │   ├── architecture.md
     │   ├── basic-elements.md
+    │   ├── four-pillars.md
     │   ├── relationships.md
     │   ├── development.md
     │   └── sources.md
     ├── examples/
     │   ├── inspect_knowledge.py
     │   ├── ten_gods.py
-    │   └── branch_ten_gods.py
+    │   ├── branch_ten_gods.py
+    │   └── four_pillars.py
     ├── knowledge/
     │   ├── 陰陽/yin_yang.yaml
     │   ├── 五行/five_elements.yaml
@@ -51,6 +53,7 @@ Where Chinese Metaphysics Meets Science/
         ├── test_layer1.py
         ├── test_ten_gods.py
         ├── test_branch_ten_gods.py
+        ├── test_four_pillars.py
         ├── test_seasonal_context.py
         └── test_loader.py
 ```
@@ -89,6 +92,7 @@ Wheel 包含 knowledge YAML，安裝後不依賴來源 checkout 的工作目錄�
 | `get_hidden_stem_season_context` | 地支中文字或 ID | `HiddenStemSeasonContext` |
 | `get_ten_god` | 日主天干、目標天干：各接受中文字或天干 ID | `TenGodResult` |
 | `get_branch_ten_gods` | 日主天干、地支：各接受中文字或所屬集合 ID | `BranchTenGodResult` |
+| `analyze_four_pillars` | 必要關鍵字 year／month／day／hour，各為中文干支字串 | `FourPillarsAnalysis` |
 | `classify_element_relation` | 日主五行、目標五行：各接受中文名或 ID | 五種日主視角的關係分類之一 |
 
 ```python
@@ -364,3 +368,40 @@ v0.2 沒有新增 YAML schema 或依賴，藏干與十神規則只有既有資�
 `test_branch_ten_gods.py` 覆蓋全部 120 個配對及 280 個子結果與 v0.1 一致、
 中文／ID 相容性、順序、物件重用、trace 引用、來源狀態、JSON 往返及錯誤邊界。
 測試會改動暫存藏干清單及 provenance，確認結果跟隨 YAML，並驗證地支表面分類不影響十神。
+
+## Four Pillars Structure v0.1
+
+**Layer 3 · Status: implemented — Structural analysis only.**
+完整模型與使用契約見 [four-pillars.md](four-pillars.md)，本節列出開發入口。
+
+```python
+from bazi_knowledge import KnowledgeBase, FourPillarsAnalysis
+
+kb = KnowledgeBase()
+result = kb.analyze_four_pillars(year="丙寅", month="辛卯", day="壬戌", hour="乙巳")
+assert result.day_master is result.chart.day.stem
+assert result.pillars[2].visible_stem_analysis.role == "day_master"
+assert result.pillars[2].visible_stem_analysis.ten_god_result is None
+assert FourPillarsAnalysis.model_validate_json(result.model_dump_json()) == result
+```
+
+亦匯出同名 module-level wrapper。輸入限四個明確關鍵字與中文字串，
+不接受 `FourPillars` 物件或 stable ID；`FourPillars` 保存解析後的 canonical 物件。
+缺少／額外參數或非字串拋出 `TypeError`；長度、順序或字元集合不符拋出含柱位置的 `ValueError`。
+API 先透過原 `get_heavenly_stem()`、`get_earthly_branch()` 驗證全部四柱，
+再呼叫三次明干 `get_ten_god()` 和四次 `get_branch_ten_gods()`。
+後者仍在 Layer 2 中逐一呼叫藏干十神，原結果物件不重建也不壓縮 trace。
+
+沿用 v0.2 的知識目錄與延遲載入要求，無新 dependency 或 YAML schema。
+來源或 Layer 2 驗證失敗會直接傳出，不回傳部分分析。
+新模型沿用 frozen／禁止額外欄位／tuple；額外檢查日主、柱位置順序及子結果所屬柱一致。
+
+```powershell
+.venv/Scripts/python.exe -X utf8 examples/four_pillars.py
+.venv/Scripts/python.exe -X utf8 examples/four_pillars.py --json
+.venv/Scripts/python.exe -m pytest -q
+```
+
+`test_four_pillars.py` 覆蓋 canonical 案例全部明干與藏干、所有位置的非法輸入、
+十個日干切換、重複柱、API 結果重用、trace／來源、JSON 往返與結構一致性。
+只測試已定義的結構契約，不加入陰陽配柱、月令或日期規則。

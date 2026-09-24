@@ -95,3 +95,17 @@ v0.2 組合既有藏干引用與 v0.1 規則，沒有新增傳統對應、規則
 外層 `sources` 合併這些步驟用到的既有來源，讓序列化結果可獨立追查來源記錄。
 藏干清單已核對，不代表十神規則已完成歷史考據，也不會解除待驗證狀態。
 120 組查詢通過表示資料串接符合規格，不驗證藏干權重、氣分類或命理因果。
+
+## Four Pillars Structure v0.1 的組合約定
+
+本版沿用使用者實作規格：四柱位置依 year／month／day／hour，日主取自 day.stem。
+這些在本次實作中標記為 **implementation convention**；未新增歷史引文，也不宣稱已完成歷史文獻核對。
+約定與適用範圍記錄於 [four-pillars.md](four-pillars.md)，不修改共用 SourceStatus 列舉。
+
+外層六步 trace 記錄 caller 輸入、柱位置、基本物件解析及日主選取；
+`source_ids` 為空 tuple，明確表示這些是本次輸入及程式組合約定，沒有引用文獻作為依據。
+`chart:input`、`pillars:year` 等引用只在本次分析內有效，不是 YAML 知識 ID。
+嵌套 Layer 2 trace 的來源 ID 保持完整，分析的 `sources` 合併其既有來源記錄。
+
+計算或組合不解除十神的 `requires_validation`，不把藏干的 source_attested 擴大成權重或氣分類證明。
+地支陰陽版本、土的季節整合、天干取象、藏干季節成因及權重仍維持原有待驗證邊界。

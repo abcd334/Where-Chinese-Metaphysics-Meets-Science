@@ -351,3 +351,69 @@ class BranchTenGodResult(DataModel):
     trace: tuple[TraceStep, ...] = Field(min_length=2, max_length=2)
     hidden_stem_source_status: SourceStatus
     sources: tuple[Source, ...] = Field(min_length=1)
+
+
+PillarPosition = Literal["year", "month", "day", "hour"]
+
+
+class Pillar(DataModel):
+    """Resolved basic facts; Chinese input is parsed by KnowledgeBase."""
+
+    stem: HeavenlyStem
+    branch: EarthlyBranch
+
+
+class FourPillars(DataModel):
+    year: Pillar
+    month: Pillar
+    day: Pillar
+    hour: Pillar
+
+
+class VisibleStemAnalysis(DataModel):
+    stem: HeavenlyStem
+    role: Literal["day_master", "target"]
+    ten_god_result: TenGodResult | None
+
+    @model_validator(mode="after")
+    def validate_role(self) -> Self:
+        if self.role == "day_master":
+            if self.ten_god_result is not None:
+                raise ValueError("day_master is the reference point, not a visible target")
+        elif self.ten_god_result is None or self.ten_god_result.target != self.stem:
+            raise ValueError("visible target needs its matching TenGodResult")
+        return self
+
+
+class PillarAnalysis(DataModel):
+    position: PillarPosition
+    pillar: Pillar
+    visible_stem_analysis: VisibleStemAnalysis
+    branch_analysis: BranchTenGodResult
+
+
+class FourPillarsAnalysis(DataModel):
+    chart: FourPillars
+    day_master: HeavenlyStem
+    pillars: tuple[PillarAnalysis, ...] = Field(min_length=4, max_length=4)
+    trace: tuple[TraceStep, ...] = Field(min_length=6, max_length=6)
+    sources: tuple[Source, ...] = Field(min_length=1)
+
+    @model_validator(mode="after")
+    def validate_structure(self) -> Self:
+        if self.day_master != self.chart.day.stem:
+            raise ValueError("day_master must be the day pillar stem")
+        if tuple(item.position for item in self.pillars) != get_args(PillarPosition):
+            raise ValueError("pillars must be ordered year, month, day, hour")
+        for item in self.pillars:
+            visible = item.visible_stem_analysis
+            if item.pillar != getattr(self.chart, item.position) or visible.stem != item.pillar.stem:
+                raise ValueError("pillar analysis must match its chart position")
+            if visible.role != ("day_master" if item.position == "day" else "target"):
+                raise ValueError("only the day position has the day_master role")
+            if visible.ten_god_result is not None and visible.ten_god_result.day_master != self.day_master:
+                raise ValueError("visible result must use the chart day_master")
+            if (item.branch_analysis.branch != item.pillar.branch
+                    or item.branch_analysis.day_master != self.day_master):
+                raise ValueError("branch result must match its pillar and chart day_master")
+        return self

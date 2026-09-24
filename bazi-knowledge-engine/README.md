@@ -18,9 +18,9 @@ v1.0 凍結目前的基本分類、引用方式與查詢契約；待考據的來
         ↓ 被引用
 2. 關係／組合規則
    生剋、藏干、季節關聯、Ten Gods v0.2；合沖刑害尚未實作
-        ↓ 未來組合
-3. 命盤結構
-   整張四柱的結構分析（尚未實作）
+        ↓ 組合既有規則
+3. 命盤結構 — Four Pillars Structure v0.1 implemented
+   已知四柱：日主、明干十神、藏干十神（Structural analysis only）
         ↓ 未來解讀
 4. 命理解讀
    旺衰、格局、喜用、大運流年等（尚未實作）
@@ -33,7 +33,10 @@ v1.0 凍結目前的基本分類、引用方式與查詢契約；待考據的來
 第二層已有五行生剋、十二地支藏干、藏干與季節的關聯查詢，以及 **Ten Gods Engine v0.2**。
 十神以兩個天干的五行方向與陰陽同異匹配十條 YAML 規則，包含結構化推理紀錄。
 v0.2 串接既有藏干查詢與 v0.1，依原藏干順序回傳每個天干的十神及完整 trace。
-目前尚未實作通用 Rule Engine 或命盤組合分析。
+**Layer 3 — Four Pillars Structure v0.1 · Status: implemented**。
+接受 caller 已知的年、月、日、時四柱，從日柱天干取得日主，組合第二層十神及藏干查詢。
+Structural analysis only. 不換算出生日期，不判斷力量或作個人命理解讀。
+目前尚未實作通用 Rule Engine。
 四層是責任分工，不代表四層都已完成，也不要求依層號刪除已存在的功能。
 
 ## 文件導覽
@@ -43,6 +46,7 @@ v0.2 串接既有藏干查詢與 v0.1，依原藏干順序回傳每個天干的�
 | 陰陽、五行、每個天干和地支是什麼？ | [基礎元素入門](docs/basic-elements.md) |
 | 四層如何分工？哪些已完成？ | [架構與目前範圍](docs/architecture.md) |
 | 生剋、藏干、四季與十神如何查詢？ | [關係資料](docs/relationships.md) |
+| 已知四柱如何取得日主、明干與藏干十神？ | [四柱結構 v0.1](docs/four-pillars.md) |
 | 如何安裝、查詢、修改 YAML 與執行測試？ | [開發參考](docs/development.md) |
 | 資料從哪裡來？哪些說法還不能確定？ | [來源與驗證邊界](docs/sources.md) |
 | 接下來先整理什麼？ | [待辦清單](TODO.md) |
@@ -87,6 +91,17 @@ assert [(item.hidden_stem.char, item.ten_god_result.ten_god.name_zh)
 
 藏干只存天干引用；完整屬性由基本資料取得。季節查詢保留資料來源與查詢步驟，
 不宣稱四季可以唯一推導出完整藏干表。
+
+```python
+analysis = kb.analyze_four_pillars(year="丙寅", month="辛卯", day="壬戌", hour="乙巳")
+assert analysis.day_master.char == "壬"
+assert analysis.pillars[2].visible_stem_analysis.role == "day_master"
+assert analysis.pillars[0].visible_stem_analysis.ten_god_result.ten_god.name_zh == "偏財"
+```
+
+四柱順序固定為 year／month／day／hour；日干優先標示「日主」，各柱藏干保留原順序。
+完整結構與 trace 範例見 [examples/four_pillars.py](examples/four_pillars.py)。
+本版只驗證每柱是已知天干＋地支，不檢查曆法上的配柱或整張四柱是否對應實際日期。
 
 個別地支說明只引用基本屬性，不帶入藏干、季節、組合或個人解讀。
 `get_concept("yin")` 仍指陰，`get_concept("wu")` 仍指戊；

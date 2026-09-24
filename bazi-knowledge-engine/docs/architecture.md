@@ -69,9 +69,27 @@ v0.2 是第二層既有能力的組合，不新增規則 YAML 或另一套十神
 
 ## 三、命盤結構
 
-未來回答「一整張四柱中有哪些可列出的結構？」
-例如辨識日主、逐柱展開藏干、列出已定義的十神與干支關係。
-這一層使用前兩層的元素和規則組合資料；目前沒有命盤模型、排盤或日期轉四柱功能。
+**Layer 3 — Four Pillars Structure v0.1 · Status: implemented**
+
+回答「caller 提供的四柱中有哪些可列出的結構？」Structural analysis only.
+四柱以必要的 year／month／day／hour 參數輸入，每柱是兩個中文字：一個天干接一個地支。
+先驗證全部引用，再以日柱天干作為日主。
+
+```text
+已知四柱 → Pillar × 4 → FourPillars
+                       ├─ day.stem → 日主
+                       ├─ 年／月／時干 → get_ten_god()
+                       └─ 四個地支 → get_branch_ten_gods()
+                                     → 原藏干順序與原 TenGodResult
+```
+
+日干標示 `role: day_master`，其 visible `ten_god_result` 為 null；
+相同天干出現在其他柱時，仍按目標天干處理。
+此層只組合 Layer 2 API，不新增生剋、藏干或十神 mapping；月支沒有額外優先或力量判斷。
+外層 trace 保存四柱位置與日主選取，嵌套結果保留既有規則 trace 和來源狀態。
+
+目前不驗證曆法配柱或日期可實現性，不排盤、不做日期轉四柱，沒有權重、旺衰、干支互動或解讀。
+完整輸入契約、模型與範例見 [四柱結構](four-pillars.md)。
 
 ## 四、命理解讀
 
@@ -91,6 +109,7 @@ v0.2 是第二層既有能力的組合，不新增規則 YAML 或另一套十神
 | 第二層藏干引用 | `knowledge/hidden_stems.yaml` |
 | 第二層十神規則 | `knowledge/ten_gods.yaml`；由既有 `KnowledgeBase` 載入與推導 |
 | 第二層季節關聯及關係說明 | `knowledge/concepts/seasons.yaml`、`hidden_stems.yaml` 等 |
+| 第三層四柱結構 | `models.py` 的四柱模型、`KnowledgeBase.analyze_four_pillars()`；不新增知識 YAML |
 | 共用載入、驗證與來源 | 既有 `loader.py`、`models.py`、`knowledge/concepts/sources.yaml` |
 
 檔案位置不等於架構層。一個檔案可以包含元素說明和相關關係說明。
