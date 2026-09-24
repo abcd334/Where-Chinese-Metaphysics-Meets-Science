@@ -10,6 +10,7 @@ from .models import (
     Concept, ConceptData, EarthlyBranch, FactReference, HeavenlyStem,
     HiddenStemSeasonContext, HiddenStemSeasonItem, KnowledgeData, RelationType,
     SourceStatus, TraceStep,
+    ElementRelation, TenGodData, TenGodElementRelation, TenGodResult, ReasoningStep,
 )
 
 
@@ -82,6 +83,18 @@ def load_concepts(
     )
 
 
+def load_ten_gods(knowledge_dir: str | Path | None = None) -> TenGodData:
+    """Read ten rules and the existing source registry without loading concepts."""
+    root = _knowledge_root(knowledge_dir)
+    data = {}
+    for path in (root.joinpath("ten_gods.yaml"), root.joinpath("concepts", "sources.yaml")):
+        document = _read_yaml(path)
+        if data.keys() & document.keys():
+            raise ValueError(f"{path}: duplicate top-level collection")
+        data.update(document)
+    return TenGodData.model_validate(data)
+
+
 class KnowledgeBase:
     def __init__(self, knowledge_dir: str | Path | None = None):
         self._knowledge_dir = Path(knowledge_dir).resolve() if knowledge_dir is not None else None
@@ -91,6 +104,102 @@ class KnowledgeBase:
     def concepts(self) -> ConceptData:
         """Concept files are loaded only when requested; fact queries stay independent."""
         return load_concepts(self._knowledge_dir, facts=self.data)
+
+    @cached_property
+    def ten_gods(self) -> TenGodData:
+        return load_ten_gods(self._knowledge_dir)
+
+    def _ten_god_stem(self, key: str) -> HeavenlyStem:
+        if not isinstance(key, str):
+            raise TypeError("Ten Gods v0.1 requires a heavenly stem character or ID")
+        for stem in self.data.heavenly_stems:
+            if key in (stem.char, stem.id):
+                return stem
+        raise KeyError(f"Unknown heavenly stem: {key!r}")
+
+    def _classify_element_ids(
+        self, day_master_id: str, target_id: str,
+    ) -> tuple[TenGodElementRelation, ElementRelation | None]:
+        if day_master_id == target_id:
+            return "same", None
+        # These are direction categories, not a second five-element relation table.
+        categories = {
+            (True, "generates"): "day_master_generates_target",
+            (True, "controls"): "day_master_controls_target",
+            (False, "generates"): "target_generates_day_master",
+            (False, "controls"): "target_controls_day_master",
+        }
+        matches = []
+        for edge in self.data.relations:
+            forward = (edge.source, edge.target) == (day_master_id, target_id)
+            reverse = (edge.source, edge.target) == (target_id, day_master_id)
+            if forward or reverse:
+                matches.append((categories[forward, edge.relation], edge))
+        if len(matches) != 1:
+            raise ValueError("Ten Gods needs exactly one directed relation between distinct elements")
+        return matches[0]
+
+    def classify_element_relation(self, day_master_element: str, target_element: str) -> TenGodElementRelation:
+        """Classify existing edges from the day master's perspective; accept names or IDs."""
+        ids = []
+        for key in (day_master_element, target_element):
+            if not isinstance(key, str):
+                raise TypeError("Element must be a Chinese name or ID")
+            element = next((item for item in self.data.elements if key in (item.id, item.name_zh)), None)
+            if element is None:
+                raise KeyError(f"Unknown element: {key!r}")
+            ids.append(element.id)
+        return self._classify_element_ids(*ids)[0]
+
+    def get_ten_god(self, day_master: str, target: str) -> TenGodResult:
+        """Classify two stems by loaded element edges, polarity and ten YAML rules."""
+        dm, other = self._ten_god_stem(day_master), self._ten_god_stem(target)
+        relation, edge = self._classify_element_ids(dm.element, other.element)
+        polarity = "same" if dm.yin_yang == other.yin_yang else "different"
+        rules = self.ten_gods
+        rule = next(rule for rule in rules.ten_gods
+                    if (rule.element_relation, rule.polarity_relation) == (relation, polarity))
+        elements = {item.id: item.name_zh for item in self.data.elements}
+        polarities = {item.id: item.name_zh for item in self.data.yin_yang}
+        labels = {"same": "同我", "day_master_generates_target": "我生",
+                  "day_master_controls_target": "我剋", "target_controls_day_master": "剋我",
+                  "target_generates_day_master": "生我"}
+        polarity_label = "陰陽相同" if polarity == "same" else "陰陽不同"
+        trace = [
+            ReasoningStep(
+                step=step, input_refs=(f"heavenly_stems:{stem.id}",),
+                output_refs=(f"elements:{stem.element}", f"yin_yang:{stem.yin_yang}"),
+                result=f"{stem.char} = {polarities[stem.yin_yang]}{elements[stem.element]}",
+                source_ids=rules.stem_source_ids,
+            )
+            for step, stem in (("resolve_day_master", dm), ("resolve_target", other))
+        ]
+        evidence = (f"{elements[dm.element]}與{elements[other.element]}五行相同" if edge is None else
+                    f"{elements[edge.source]}{'生' if edge.relation == 'generates' else '剋'}{elements[edge.target]}")
+        trace.extend((
+            ReasoningStep(
+                step="element_relation", input_refs=(f"elements:{dm.element}", f"elements:{other.element}"),
+                output_refs=(f"element_relation:{relation}",), element_relation=relation, element_edge=edge,
+                result=f"{evidence}，因此為{labels[relation]}（{relation}）", source_ids=rules.element_source_ids,
+            ),
+            ReasoningStep(
+                step="polarity_relation", input_refs=(f"yin_yang:{dm.yin_yang}", f"yin_yang:{other.yin_yang}"),
+                output_refs=(f"polarity_relation:{polarity}",), polarity_relation=polarity,
+                result=f"{polarities[dm.yin_yang]} / {polarities[other.yin_yang]}：{polarity_label}（{polarity}）",
+                source_ids=rule.source_ids,
+            ),
+            ReasoningStep(
+                step="ten_god_rule", input_refs=(f"element_relation:{relation}", f"polarity_relation:{polarity}"),
+                output_refs=(f"ten_gods:{rule.id}",), rule_id=rule.id,
+                element_relation=relation, polarity_relation=polarity,
+                result=f"{labels[relation]} + {polarity_label} → {rule.name_zh}", source_ids=rule.source_ids,
+            ),
+        ))
+        used_sources = {source for step in trace for source in step.source_ids}
+        return TenGodResult(
+            ten_god=rule, day_master=dm, target=other, element_relation=relation, polarity_relation=polarity,
+            trace=tuple(trace), sources=tuple(source for source in rules.sources if source.id in used_sources),
+        )
 
     def get_concept(self, key: str) -> Concept:
         for concept in self.concepts.concepts:
@@ -219,6 +328,14 @@ class KnowledgeBase:
 
 def get_heavenly_stem(char: str) -> HeavenlyStem:
     return KnowledgeBase().get_heavenly_stem(char)
+
+
+def get_ten_god(day_master: str, target: str) -> TenGodResult:
+    return KnowledgeBase().get_ten_god(day_master, target)
+
+
+def classify_element_relation(day_master_element: str, target_element: str) -> TenGodElementRelation:
+    return KnowledgeBase().classify_element_relation(day_master_element, target_element)
 
 
 def get_earthly_branch(char: str) -> EarthlyBranch:

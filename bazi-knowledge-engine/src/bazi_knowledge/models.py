@@ -1,7 +1,7 @@
-"""Validated basic data only; no derived attributes or interpretation."""
+"""Validated knowledge, relation rules and trace results; no personal interpretation."""
 
 from datetime import date
-from typing import Annotated, Literal, Self
+from typing import Annotated, Literal, Self, get_args
 
 from pydantic import BaseModel, ConfigDict, Field, HttpUrl, StrictInt, StringConstraints, model_validator
 
@@ -263,3 +263,75 @@ class HiddenStemSeasonContext(DataModel):
     hidden_stems: tuple[HiddenStemSeasonItem, ...]
     explanation: Concept
     trace: tuple[TraceStep, ...]
+
+
+TenGodElementRelation = Literal[
+    "same", "day_master_generates_target", "day_master_controls_target",
+    "target_controls_day_master", "target_generates_day_master",
+]
+PolarityRelation = Literal["same", "different"]
+
+
+class TenGod(DataModel):
+    """One named outcome and its unique rule; no stem-pair lookup table."""
+
+    id: Identifier
+    name_zh: Text
+    aliases: tuple[Text, ...] = ()
+    element_relation: TenGodElementRelation
+    polarity_relation: PolarityRelation
+    source_ids: tuple[Identifier, ...] = Field(min_length=1)
+    source_status: SourceStatus
+
+
+class TenGodData(DataModel):
+    ten_gods: tuple[TenGod, ...] = Field(min_length=10, max_length=10)
+    sources: tuple[Source, ...] = Field(min_length=1)
+    stem_source_ids: tuple[Identifier, ...] = Field(min_length=1)
+    element_source_ids: tuple[Identifier, ...] = Field(min_length=1)
+
+    @model_validator(mode="after")
+    def validate_rules(self) -> Self:
+        for field in ("id", "name_zh"):
+            values = [getattr(rule, field) for rule in self.ten_gods]
+            if len(set(values)) != len(values):
+                raise ValueError(f"ten_gods: duplicate {field}")
+        labels = [label for rule in self.ten_gods for label in (rule.name_zh, *rule.aliases)]
+        if len(set(labels)) != len(labels):
+            raise ValueError("ten_gods: duplicate or conflicting alias")
+        combinations = {(rule.element_relation, rule.polarity_relation) for rule in self.ten_gods}
+        expected = {(relation, polarity) for relation in get_args(TenGodElementRelation)
+                    for polarity in get_args(PolarityRelation)}
+        if combinations != expected:
+            raise ValueError("ten_gods: each element/polarity combination needs exactly one rule")
+        source_ids = {source.id for source in self.sources}
+        if len(source_ids) != len(self.sources):
+            raise ValueError("ten_gods: duplicate source id")
+        for references in (self.stem_source_ids, self.element_source_ids,
+                           *(rule.source_ids for rule in self.ten_gods)):
+            if not set(references) <= source_ids:
+                raise ValueError("ten_gods: unknown source reference")
+        return self
+
+
+class ReasoningStep(DataModel):
+    step: Literal["resolve_day_master", "resolve_target", "element_relation",
+                  "polarity_relation", "ten_god_rule"]
+    input_refs: tuple[Text, ...]
+    output_refs: tuple[Text, ...]
+    result: Text
+    source_ids: tuple[Identifier, ...] = Field(min_length=1)
+    element_relation: TenGodElementRelation | None = None
+    element_edge: ElementRelation | None = None
+    polarity_relation: PolarityRelation | None = None
+    rule_id: Identifier | None = None
+
+
+class TenGodResult(DataModel):
+    ten_god: TenGod
+    day_master: HeavenlyStem
+    target: HeavenlyStem
+    element_relation: TenGodElementRelation
+    polarity_relation: PolarityRelation
+    trace: tuple[ReasoningStep, ...] = Field(min_length=5, max_length=5)
+    sources: tuple[Source, ...] = Field(min_length=1)

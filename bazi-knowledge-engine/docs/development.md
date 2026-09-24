@@ -20,13 +20,15 @@ Where Chinese Metaphysics Meets Science/
     │   ├── development.md
     │   └── sources.md
     ├── examples/
-    │   └── inspect_knowledge.py
+    │   ├── inspect_knowledge.py
+    │   └── ten_gods.py
     ├── knowledge/
     │   ├── 陰陽/yin_yang.yaml
     │   ├── 五行/five_elements.yaml
     │   ├── 天干/heavenly_stems.yaml
     │   ├── 地支/earthly_branches.yaml
     │   ├── hidden_stems.yaml
+    │   ├── ten_gods.yaml
     │   └── concepts/
     │       ├── sources.yaml
     │       ├── seasons.yaml
@@ -46,6 +48,7 @@ Where Chinese Metaphysics Meets Science/
         ├── test_hidden_stems.py
         ├── test_concepts.py
         ├── test_layer1.py
+        ├── test_ten_gods.py
         ├── test_seasonal_context.py
         └── test_loader.py
 ```
@@ -60,6 +63,7 @@ python -m venv .venv
 .venv/Scripts/python.exe -m pip install -e ".[dev]"
 .venv/Scripts/python.exe -m pytest -q
 .venv/Scripts/python.exe -X utf8 examples/inspect_knowledge.py
+.venv/Scripts/python.exe -X utf8 examples/ten_gods.py
 ```
 
 macOS／Linux 將 Python 路徑換成 `.venv/bin/python`。
@@ -81,6 +85,8 @@ Wheel 包含 knowledge YAML，安裝後不依賴來源 checkout 的工作目錄�
 | `get_hidden_stems` | 地支中文字或 ID | 有序 `list[HeavenlyStem]` |
 | `get_concept` | 說明 ID／中文名、天干 ID／中文字、地支中文字或 `branch_` 說明 ID | `Concept` |
 | `get_hidden_stem_season_context` | 地支中文字或 ID | `HiddenStemSeasonContext` |
+| `get_ten_god` | 日主天干、目標天干：各接受中文字或天干 ID | `TenGodResult` |
+| `classify_element_relation` | 日主五行、目標五行：各接受中文名或 ID | 五種日主視角的關係分類之一 |
 
 ```python
 from bazi_knowledge import KnowledgeBase
@@ -184,7 +190,7 @@ Loader 保留清單順序，pytest 核對採用的完整對應與順序。不接
 因此 `load_concepts()` 提供原始說明，`get_concept()` 提供含基本分類的完整說明。
 查詢保留原 `source_ids` 與 `source_status`，不以 `derived_from_facts` 蓋掉地支的待驗證狀態。
 
-`ConceptData` 合併七份說明資料，含 28 筆儲存的說明、11 筆來源、4 季及 12 筆地支季節位置。
+`ConceptData` 合併七份說明資料，含 28 筆儲存的說明、12 筆共用來源、4 季及 12 筆地支季節位置。
 十干動態介紹不算在這 28 筆中。驗證包含 ID／名稱唯一、來源引用、基本資料引用與季節位置完整性，
 並要求十二支說明全部有引用，且中文名與引用的地支一致。
 Schema 能檢查形狀和引用，不能自動判斷所有自然語言內容是否越界，文字仍需人工審閱。
@@ -222,3 +228,85 @@ Layer 1 — Basic Elements 的 **Status: v1.0 complete** 是知識範圍及查�
 `test_layer1.py` 驗收 29 個基本元素的說明、引用、來源、欄位與文字邊界；
 文字檢查是目前資料集的回歸保護，不是通用自然語言判讀器。
 待考據項目及後續建議見 [TODO](../TODO.md)。
+
+## Ten Gods Engine v0.1
+
+十神使用既有 `KnowledgeBase`、`DataModel`、`Source`、`SourceStatus` 和嚴格 YAML reader。
+原基本資料、藏干、季節及 Concept API 不變。新 API 不接受模型物件，只接受天干名稱或 ID 字串；
+例如 `wu` 在此指天干戊，`午`、`yin`、出生日期字串均拋出 `KeyError`。
+非字串（包括地支物件、list、dict）拋出 `TypeError`。
+
+```python
+from bazi_knowledge import KnowledgeBase, get_ten_god, classify_element_relation
+
+kb = KnowledgeBase()
+result = kb.get_ten_god("壬", "乙")
+assert result == get_ten_god("ren", "yi")
+assert result.day_master is kb.get_heavenly_stem("壬")
+assert result.target is kb.get_heavenly_stem("乙")
+assert result.ten_god.name_zh == "傷官"
+assert result.trace[-1].rule_id == "shang_guan"
+assert result.ten_god.source_status.value == "requires_validation"
+assert classify_element_relation("water", "metal") == "target_generates_day_master"
+payload = result.model_dump(mode="json", exclude_none=True)
+```
+
+### 規則 schema
+
+`knowledge/ten_gods.yaml` 頂層為 `stem_source_ids`、`element_source_ids`、`ten_gods`。
+前兩者列出 trace 引用的既有天干／五行關係來源；`ten_gods` 是十筆規則。
+下例是部分記錄，不是可單獨載入的完整規則表：
+
+```yaml
+stem_source_ids: [phase1_spec, hko_order, ndl_elements]
+element_source_ids: [phase1_spec]
+ten_gods:
+  - id: shang_guan
+    name_zh: 傷官
+    aliases: []
+    element_relation: day_master_generates_target
+    polarity_relation: different
+    source_ids: [ten_gods_v01_spec]
+    source_status:
+      value: requires_validation
+      note: 使用者 canonical implementation specification，尚待歷史文獻版本核對。
+```
+
+`TenGod` 同時保存名稱與匹配條件；名稱與規則一對一，因此 `id` 也是 `rule_id`，
+不用另一張十神結果表。五行分類值見[完整關係表](relationships.md)，陰陽分類只允許 `same`／`different`。
+`aliases` 預設為空；七殺記錄偏官別名。程式不以 alias 判斷規則。
+
+`TenGodData` 保存十條規則、來源記錄及兩種基本來源 ID 清單，驗證：
+
+- 十條記錄、唯一 ID 與中文名，alias 不可重複或與 canonical name 衝突。
+- 五種五行分類 × 兩種陰陽分類，每組恰有一條規則，拒絕缺漏或重複。
+- 來源 ID 必須存在於共用 registry，來源 ID 不可重複定義；來源清單不可為空。
+- 所有模型拒絕額外欄位，名稱與來源說明不得為空。
+
+`load_ten_gods(knowledge_dir=...)` 讀取規則及既有 `concepts/sources.yaml`，不載入其他說明或季節檔案。
+`KnowledgeBase.ten_gods` 首次使用才載入並快取。缺少十神檔案時，舊 API 照常工作；
+十神查詢拋出 `FileNotFoundError`，不回退到預設規則。
+自訂目錄需提供同一結構的來源 registry；新來源 ID 也必須在該目錄中登錄。
+
+### 結果與 trace
+
+| 模型 | 欄位 |
+| --- | --- |
+| `TenGodResult` | `ten_god`, `day_master`, `target`, `element_relation`, `polarity_relation`, `trace`, `sources` |
+| `ReasoningStep` | `step`, `input_refs`, `output_refs`, `result`, `source_ids`；適用步驟另有 `element_relation`, `element_edge`, `polarity_relation`, `rule_id` |
+
+`trace` 為五步有序 tuple：resolve_day_master、resolve_target、element_relation、polarity_relation、ten_god_rule。
+`input_refs`／`output_refs` 沿用 `collection:id` 格式；`element_relation:...` 和 `polarity_relation:...`
+是本次運算的中間結果，其他引用對應已載入的基本資料或規則。
+五行步驟保留實際使用的有向 `ElementRelation`；同五行時 `element_edge` 為 null。
+中文 `result` 只是結構化判斷的呈現，不是規則輸入。
+
+結果中的天干與十神物件引用已載入資料，`sources` 提供這五步所使用來源的完整記錄。
+規則 `source_status` 原樣保留，不因匹配成功變成已驗證。物件 frozen、集合 tuple，並可 JSON 序列化。
+
+新分類器對不同五行檢查既有生剋邊的正反方向；若候選不是恰好一條，拋出 `ValueError`。
+此限制只作用於十神分類，沒有改動第一層或原直接邊查詢的行為。
+
+`test_ten_gods.py` 覆蓋壬／甲日主指定案例、100 組配對、每個日主十神各一次、完整 trace、
+不合法輸入／規則／來源，以及修改暫存 YAML 後結論隨資料變動的測試。
+本版不實作地支或藏干的自動十神展開；v0.2 僅列於 TODO。

@@ -1,0 +1,95 @@
+# Ten Gods v0.1: user-supplied canonical implementation specification.
+# Ten predicates, not 100 stem pairs. Historical source validation remains pending.
+stem_source_ids: [phase1_spec, hko_order, ndl_elements]
+element_source_ids: [phase1_spec]
+ten_gods:
+  - id: bi_jian
+    name_zh: 比肩
+    aliases: []
+    element_relation: same
+    polarity_relation: same
+    source_ids: [ten_gods_v01_spec]
+    source_status:
+      value: requires_validation
+      note: "採用使用者 Ten Gods v0.1 實作規格；完整十神對應與名稱尚待指定文獻版本核對，不是科學定律。"
+  - id: jie_cai
+    name_zh: 劫財
+    aliases: []
+    element_relation: same
+    polarity_relation: different
+    source_ids: [ten_gods_v01_spec]
+    source_status:
+      value: requires_validation
+      note: "採用使用者 Ten Gods v0.1 實作規格；完整十神對應與名稱尚待指定文獻版本核對，不是科學定律。"
+  - id: shi_shen
+    name_zh: 食神
+    aliases: []
+    element_relation: day_master_generates_target
+    polarity_relation: same
+    source_ids: [ten_gods_v01_spec]
+    source_status:
+      value: requires_validation
+      note: "採用使用者 Ten Gods v0.1 實作規格；完整十神對應與名稱尚待指定文獻版本核對，不是科學定律。"
+  - id: shang_guan
+    name_zh: 傷官
+    aliases: []
+    element_relation: day_master_generates_target
+    polarity_relation: different
+    source_ids: [ten_gods_v01_spec]
+    source_status:
+      value: requires_validation
+      note: "採用使用者 Ten Gods v0.1 實作規格；完整十神對應與名稱尚待指定文獻版本核對，不是科學定律。"
+  - id: pian_cai
+    name_zh: 偏財
+    aliases: []
+    element_relation: day_master_controls_target
+    polarity_relation: same
+    source_ids: [ten_gods_v01_spec]
+    source_status:
+      value: requires_validation
+      note: "採用使用者 Ten Gods v0.1 實作規格；完整十神對應與名稱尚待指定文獻版本核對，不是科學定律。"
+  - id: zheng_cai
+    name_zh: 正財
+    aliases: []
+    element_relation: day_master_controls_target
+    polarity_relation: different
+    source_ids: [ten_gods_v01_spec]
+    source_status:
+      value: requires_validation
+      note: "採用使用者 Ten Gods v0.1 實作規格；完整十神對應與名稱尚待指定文獻版本核對，不是科學定律。"
+  - id: qi_sha
+    name_zh: 七殺
+    aliases: [偏官]
+    element_relation: target_controls_day_master
+    polarity_relation: same
+    source_ids: [ten_gods_v01_spec]
+    source_status:
+      value: requires_validation
+      note: "採用使用者 Ten Gods v0.1 實作規格；完整十神對應與名稱尚待指定文獻版本核對，不是科學定律。"
+  - id: zheng_guan
+    name_zh: 正官
+    aliases: []
+    element_relation: target_controls_day_master
+    polarity_relation: different
+    source_ids: [ten_gods_v01_spec]
+    source_status:
+      value: requires_validation
+      note: "採用使用者 Ten Gods v0.1 實作規格；完整十神對應與名稱尚待指定文獻版本核對，不是科學定律。"
+  - id: pian_yin
+    name_zh: 偏印
+    aliases: []
+    element_relation: target_generates_day_master
+    polarity_relation: same
+    source_ids: [ten_gods_v01_spec]
+    source_status:
+      value: requires_validation
+      note: "採用使用者 Ten Gods v0.1 實作規格；完整十神對應與名稱尚待指定文獻版本核對，不是科學定律。"
+  - id: zheng_yin
+    name_zh: 正印
+    aliases: []
+    element_relation: target_generates_day_master
+    polarity_relation: different
+    source_ids: [ten_gods_v01_spec]
+    source_status:
+      value: requires_validation
+      note: "採用使用者 Ten Gods v0.1 實作規格；完整十神對應與名稱尚待指定文獻版本核對，不是科學定律。"

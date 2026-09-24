@@ -12,10 +12,12 @@ from .loader import (
     get_hidden_stem_season_context,
     load_concepts,
     load_knowledge,
+    get_ten_god, classify_element_relation, load_ten_gods,
 )
 from .models import (
     EarthlyBranch, Element, ElementRelation, HeavenlyStem, HiddenStemSet, KnowledgeData, YinYang,
     Concept, ConceptData, Source, SourceStatus, TraditionalAssociation, HiddenStemSeasonContext,
+    TenGod, TenGodData, TenGodResult, ReasoningStep,
 )
 
 __all__ = [
@@ -25,4 +27,6 @@ __all__ = [
     "get_element_relation", "HiddenStemSet", "get_hidden_stems",
     "Concept", "ConceptData", "Source", "SourceStatus", "TraditionalAssociation",
     "HiddenStemSeasonContext", "get_concept", "get_hidden_stem_season_context", "load_concepts",
+    "TenGod", "TenGodData", "TenGodResult", "ReasoningStep", "get_ten_god",
+    "classify_element_relation", "load_ten_gods",
 ]

@@ -1,4 +1,10 @@
 sources:
+  - id: "ten_gods_v01_spec"
+    title: "Ten Gods v0.1 — user-supplied canonical implementation specification"
+    url: null
+    locator: "2026-09-24 使用者規格第 4、6、7、8 節；knowledge/ten_gods.yaml；docs/relationships.md：十神 v0.1"
+    scope: "五種五行方向分類乘兩種陰陽關係的十條對應、名稱與七殺／偏官別名。Requires source validation：未指定完整古籍版本；核對日期指實作規格，非歷史考證。"
+    checked_on: "2026-09-24"
   - id: "branch_polarity"
     title: "《三命通會》論支元六合網路轉錄（版本待覆核）"
     url: "https://sajumania.com/ebook/to01-05/to01-05-02-21.htm"

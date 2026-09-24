@@ -47,6 +47,7 @@
 | `sanming_renyuan` | 《三命通會》卷二〈論人元司事〉中藏干與四時的語境及不同說法；不驗證現有清單的全部順序或成因。 |
 | `hko_order`、`ndl_elements` | 對應上述公開干支分類資料。 |
 | `branch_polarity` | 對應既有 `branch-polarity`；把原文件中的待覆核來源登錄為可查詢引用。個別地支說明保留 `requires_validation`。 |
+| `ten_gods_v01_spec` | 2026-09-24 使用者 Ten Gods v0.1 canonical implementation specification，涵蓋十條對應、名稱、方向定義、陰陽比較及七殺／偏官別名；不是古籍引文。 |
 
 檔首代號使用連字號，程式來源 ID 使用底線，保留既有命名以避免破壞引用。
 `phase1`／`phase2` 表示原始規格來源，不是現在的架構層名稱。
@@ -69,3 +70,15 @@
 
 Layer 1 v1.0 complete 表示已完整提供基本元素資料、說明與來源狀態，
 不表示所有來源已完成版本考據。產生或串接說明不會自動解除 `requires_validation`。
+
+## Ten Gods v0.1 的採用依據
+
+[十神規則](../knowledge/ten_gods.yaml) 直接採用本次使用者指定的十條 canonical mapping。
+`ten_gods_v01_spec` 的 URL 為 null；`checked_on: 2026-09-24` 只指核對實作規格。
+本次未搜尋或補入網路引用。完整對應、名稱與別名的歷史文獻版本均仍 **Requires source validation**。
+
+每條規則保存 `source_ids` 與 `source_status: requires_validation`。
+結果的 `ten_god` 保留原規則狀態；`sources` 提供 trace 所用來源的完整記錄。
+基本天干來源由 YAML 的 `stem_source_ids` 指定，五行關係來源由 `element_source_ids` 指定，
+二者均引用既有 registry，沒有另造五行對應表。
+計算成功與 100 組測試通過表示實作符合採用規格，不代表完成歷史考證或證明自然因果。

@@ -17,7 +17,7 @@ v1.0 凍結目前的基本分類、引用方式與查詢契約；待考據的來
    陰陽、五行、天干、地支：基本屬性＋白話說明
         ↓ 被引用
 2. 關係／組合規則
-   生剋、藏干；未來才加入十神、合沖刑害與條件式規則
+   生剋、藏干、季節關聯、Ten Gods v0.1；合沖刑害尚未實作
         ↓ 未來組合
 3. 命盤結構
    整張四柱的結構分析（尚未實作）
@@ -30,8 +30,9 @@ v1.0 凍結目前的基本分類、引用方式與查詢契約；待考據的來
 例如甲的基本屬性是「天干第 1 位、陽、木」，白話說明是「甲是十天干之一，在五行與陰陽的分類中屬陽木」。
 這些內容不推論人的性格或命運。
 
-第二層已有五行生剋、十二地支藏干，以及藏干與季節的關聯查詢。
-它們目前是固定資料的查詢與串接，尚未實作通用 Rule Engine 或命盤組合分析。
+第二層已有五行生剋、十二地支藏干、藏干與季節的關聯查詢，以及 **Ten Gods Engine v0.1**。
+十神以兩個天干的五行方向與陰陽同異匹配十條 YAML 規則，包含結構化推理紀錄。
+目前尚未實作通用 Rule Engine 或命盤組合分析。
 四層是責任分工，不代表四層都已完成，也不要求依層號刪除已存在的功能。
 
 ## 文件導覽
@@ -40,7 +41,7 @@ v1.0 凍結目前的基本分類、引用方式與查詢契約；待考據的來
 | --- | --- |
 | 陰陽、五行、每個天干和地支是什麼？ | [基礎元素入門](docs/basic-elements.md) |
 | 四層如何分工？哪些已完成？ | [架構與目前範圍](docs/architecture.md) |
-| 生剋、藏干、四季如何連接？ | [關係資料](docs/relationships.md) |
+| 生剋、藏干、四季與十神如何查詢？ | [關係資料](docs/relationships.md) |
 | 如何安裝、查詢、修改 YAML 與執行測試？ | [開發參考](docs/development.md) |
 | 資料從哪裡來？哪些說法還不能確定？ | [來源與驗證邊界](docs/sources.md) |
 | 接下來先整理什麼？ | [待辦清單](TODO.md) |
@@ -69,6 +70,11 @@ assert kb.get_concept("寅") == kb.get_concept("branch_yin")
 assert kb.get_concept("寅").fact_ref.id == "yin"
 assert "陽木" in kb.get_concept("寅").short_definition
 assert [stem.char for stem in kb.get_hidden_stems("寅")] == ["甲", "丙", "戊"]
+
+result = kb.get_ten_god("壬", "乙")
+assert result.ten_god.name_zh == "傷官"
+assert result == kb.get_ten_god("ren", "yi")
+assert kb.get_ten_god("壬", "辛").ten_god.name_zh == "正印"
 ```
 
 藏干只存天干引用；完整屬性由基本資料取得。季節查詢保留資料來源與查詢步驟，
@@ -79,5 +85,7 @@ assert [stem.char for stem in kb.get_hidden_stems("寅")] == ["甲", "丙", "戊
 地支使用中文字或 `branch_` 前綴的說明 ID，避免不同集合的 ID 衝突。
 
 v1.0 驗收包含完整引用、來源狀態保留、說明跟隨基本 YAML、欄位限制與既有功能回歸。
-本次沿用現有 YAML 與模型，沒有新增第二層規則。尚未加入排盤、日期換算、十神、
-合沖刑害、個人命理解讀、資料庫、Web UI 或 LLM。
+十神 v0.1 只接受 **Day Master Heavenly Stem × Target Heavenly Stem**，不接收地支或命盤；
+日主與地支藏干的自動展開留待 v0.2，尚未實作。完整示例見 [examples/ten_gods.py](examples/ten_gods.py)。
+十條規則採用使用者指定的 canonical implementation specification，歷史文獻依據仍標記
+`requires_validation`。尚未加入排盤、日期換算、合沖刑害、個人命理解讀、資料庫、Web UI 或 LLM。
