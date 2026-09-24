@@ -335,3 +335,19 @@ class TenGodResult(DataModel):
     polarity_relation: PolarityRelation
     trace: tuple[ReasoningStep, ...] = Field(min_length=5, max_length=5)
     sources: tuple[Source, ...] = Field(min_length=1)
+
+
+class HiddenStemTenGodResult(DataModel):
+    hidden_stem: HeavenlyStem
+    ten_god_result: TenGodResult
+
+
+class BranchTenGodResult(DataModel):
+    """Ordered hidden-stem results; mapping provenance is separate from rule provenance."""
+
+    day_master: HeavenlyStem
+    branch: EarthlyBranch
+    hidden_stem_results: tuple[HiddenStemTenGodResult, ...] = Field(min_length=1)
+    trace: tuple[TraceStep, ...] = Field(min_length=2, max_length=2)
+    hidden_stem_source_status: SourceStatus
+    sources: tuple[Source, ...] = Field(min_length=1)

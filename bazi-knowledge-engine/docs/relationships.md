@@ -2,7 +2,7 @@
 
 [回文件導覽](../README.md) · [基本元素](basic-elements.md) · [API 參考](development.md)
 
-本頁屬第二層。目前已有五行生剋、藏干、季節關聯，以及 Ten Gods Engine v0.1。
+本頁屬第二層。目前已有五行生剋、藏干、季節關聯，以及 Ten Gods Engine v0.1／v0.2。
 提供固定關係查詢與十神規則推導，還沒有通用推理引擎。
 
 ## 五行相生與相剋
@@ -179,4 +179,36 @@ assert kb.get_ten_god("壬", "辛").ten_god.name_zh == "正印"
 
 驗收包含 100 種天干組合唯一命中，以及每個日主的十個目標恰好涵蓋十神各一次。
 完整可執行 trace 示例見 [examples/ten_gods.py](../examples/ten_gods.py)。
-Ten Gods v0.2 可再規劃日主與地支藏干的串接，本版尚未實作。
+
+## Ten Gods v0.2：日主 × 地支藏干
+
+caller 指定日主天干和一個地支。系統先呼叫 `get_hidden_stems()`，
+再把每個藏干 ID 交給既有 `get_ten_god()`，保留全部子結果與五步推理。
+地支本身不被歸納成單一十神。
+
+```python
+result = kb.get_branch_ten_gods("壬", "戌")
+assert result == kb.get_branch_ten_gods("ren", "xu")
+for item in result.hidden_stem_results:
+    print(item.hidden_stem.char, item.ten_god_result.ten_god.name_zh)
+```
+
+```text
+earthly_branches:xu（戌）
+    → hidden_stems:xu（knowledge/hidden_stems.yaml）
+    → heavenly_stems:wu, heavenly_stems:xin, heavenly_stems:ding
+
+日主 壬 = 陽水
+├─ 戊 = 陽土 → 土剋水 → 剋我 + same      → qi_sha    → 七殺
+├─ 辛 = 陰金 → 金生水 → 生我 + different → zheng_yin → 正印
+└─ 丁 = 陰火 → 水剋火 → 我剋 + different → zheng_cai → 正財
+```
+
+頂層 `trace` 保存地支到藏干的 lookup／join 引用，子結果的 `ten_god_result.trace`
+保存 v0.1 原五步推理，兩者透過 `heavenly_stems:id` 相接。
+來源清單及藏干／十神各自的驗證狀態一起回傳；詳見 [API 與結果 schema](development.md#ten-gods-engine-v02)。
+完整可執行示例：[examples/branch_ten_gods.py](../examples/branch_ten_gods.py)。
+
+驗收覆蓋 10 個日主 × 12 個地支，合計 120 組查詢、280 個藏干十神子結果。
+原順序只表示 canonical ordering，不表示力量、主中餘氣或百分比。
+本版不接收四柱、日期、大運或流年，不辨識日主、不加入命理解讀。

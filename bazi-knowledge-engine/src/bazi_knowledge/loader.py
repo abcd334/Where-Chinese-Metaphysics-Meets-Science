@@ -11,6 +11,7 @@ from .models import (
     HiddenStemSeasonContext, HiddenStemSeasonItem, KnowledgeData, RelationType,
     SourceStatus, TraceStep,
     ElementRelation, TenGodData, TenGodElementRelation, TenGodResult, ReasoningStep,
+    BranchTenGodResult, HiddenStemTenGodResult,
 )
 
 
@@ -296,6 +297,33 @@ class KnowledgeBase:
         stems_by_id = {record.id: record for record in self.data.heavenly_stems}
         return [stems_by_id[stem_id] for stem_id in hidden.stem_ids]
 
+    def get_branch_ten_gods(self, day_master: str, branch: str) -> BranchTenGodResult:
+        """Compose hidden-stem lookup and v0.1 reasoning, preserving stored order."""
+        master = self._ten_god_stem(day_master)
+        if not isinstance(branch, str):
+            raise TypeError("branch requires an earthly branch character or ID")
+        stems = self.get_hidden_stems(branch)
+        record = next(item for item in self.data.earthly_branches
+                      if branch in (item.id, item.char))
+        provenance = self.get_concept("hidden_stems")
+        items = tuple(HiddenStemTenGodResult(
+            hidden_stem=stem, ten_god_result=self.get_ten_god(master.id, stem.id),
+        ) for stem in stems)
+        trace = (
+            TraceStep(operation="lookup", input_refs=(f"earthly_branches:{record.id}",),
+                      output_refs=(f"hidden_stems:{record.id}",), source_ids=provenance.source_ids),
+            TraceStep(operation="join", input_refs=(f"hidden_stems:{record.id}",),
+                      output_refs=tuple(f"heavenly_stems:{stem.id}" for stem in stems),
+                      source_ids=provenance.source_ids),
+        )
+        source_ids = set(provenance.source_ids)
+        source_ids.update(source.id for item in items for source in item.ten_god_result.sources)
+        return BranchTenGodResult(
+            day_master=master, branch=record, hidden_stem_results=items, trace=trace,
+            hidden_stem_source_status=provenance.source_status,
+            sources=tuple(source for source in self.concepts.sources if source.id in source_ids),
+        )
+
     def _element_id(self, name_zh: str) -> str:
         for record in self.data.elements:
             if record.name_zh == name_zh:
@@ -332,6 +360,10 @@ def get_heavenly_stem(char: str) -> HeavenlyStem:
 
 def get_ten_god(day_master: str, target: str) -> TenGodResult:
     return KnowledgeBase().get_ten_god(day_master, target)
+
+
+def get_branch_ten_gods(day_master: str, branch: str) -> BranchTenGodResult:
+    return KnowledgeBase().get_branch_ten_gods(day_master, branch)
 
 
 def classify_element_relation(day_master_element: str, target_element: str) -> TenGodElementRelation:

@@ -82,3 +82,16 @@ Layer 1 v1.0 complete 表示已完整提供基本元素資料、說明與來源�
 基本天干來源由 YAML 的 `stem_source_ids` 指定，五行關係來源由 `element_source_ids` 指定，
 二者均引用既有 registry，沒有另造五行對應表。
 計算成功與 100 組測試通過表示實作符合採用規格，不代表完成歷史考證或證明自然因果。
+
+## Ten Gods v0.2 的追溯
+
+v0.2 組合既有藏干引用與 v0.1 規則，沒有新增傳統對應、規則來源或文獻引用。
+地支 → 藏干的兩步 trace 使用 `get_concept("hidden_stems")` 原有來源 ID，
+目前為 `phase2_spec`，其 locator 指向 `knowledge/hidden_stems.yaml`。
+結果的 `hidden_stem_source_status` 保留這份藏干資料的狀態；目前 `source_attested`
+僅指已核對使用者指定清單與順序。
+
+每個子結果完整保留 v0.1 的五步 trace 與 `ten_god.source_status: requires_validation`。
+外層 `sources` 合併這些步驟用到的既有來源，讓序列化結果可獨立追查來源記錄。
+藏干清單已核對，不代表十神規則已完成歷史考據，也不會解除待驗證狀態。
+120 組查詢通過表示資料串接符合規格，不驗證藏干權重、氣分類或命理因果。

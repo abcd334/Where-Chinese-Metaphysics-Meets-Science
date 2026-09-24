@@ -17,7 +17,7 @@ v1.0 凍結目前的基本分類、引用方式與查詢契約；待考據的來
    陰陽、五行、天干、地支：基本屬性＋白話說明
         ↓ 被引用
 2. 關係／組合規則
-   生剋、藏干、季節關聯、Ten Gods v0.1；合沖刑害尚未實作
+   生剋、藏干、季節關聯、Ten Gods v0.2；合沖刑害尚未實作
         ↓ 未來組合
 3. 命盤結構
    整張四柱的結構分析（尚未實作）
@@ -30,8 +30,9 @@ v1.0 凍結目前的基本分類、引用方式與查詢契約；待考據的來
 例如甲的基本屬性是「天干第 1 位、陽、木」，白話說明是「甲是十天干之一，在五行與陰陽的分類中屬陽木」。
 這些內容不推論人的性格或命運。
 
-第二層已有五行生剋、十二地支藏干、藏干與季節的關聯查詢，以及 **Ten Gods Engine v0.1**。
+第二層已有五行生剋、十二地支藏干、藏干與季節的關聯查詢，以及 **Ten Gods Engine v0.2**。
 十神以兩個天干的五行方向與陰陽同異匹配十條 YAML 規則，包含結構化推理紀錄。
+v0.2 串接既有藏干查詢與 v0.1，依原藏干順序回傳每個天干的十神及完整 trace。
 目前尚未實作通用 Rule Engine 或命盤組合分析。
 四層是責任分工，不代表四層都已完成，也不要求依層號刪除已存在的功能。
 
@@ -75,6 +76,13 @@ result = kb.get_ten_god("壬", "乙")
 assert result.ten_god.name_zh == "傷官"
 assert result == kb.get_ten_god("ren", "yi")
 assert kb.get_ten_god("壬", "辛").ten_god.name_zh == "正印"
+
+branch_result = kb.get_branch_ten_gods("壬", "戌")
+assert branch_result == kb.get_branch_ten_gods("ren", "xu")
+assert [(item.hidden_stem.char, item.ten_god_result.ten_god.name_zh)
+        for item in branch_result.hidden_stem_results] == [
+    ("戊", "七殺"), ("辛", "正印"), ("丁", "正財"),
+]
 ```
 
 藏干只存天干引用；完整屬性由基本資料取得。季節查詢保留資料來源與查詢步驟，
@@ -86,6 +94,8 @@ assert kb.get_ten_god("壬", "辛").ten_god.name_zh == "正印"
 
 v1.0 驗收包含完整引用、來源狀態保留、說明跟隨基本 YAML、欄位限制與既有功能回歸。
 十神 v0.1 只接受 **Day Master Heavenly Stem × Target Heavenly Stem**，不接收地支或命盤；
-日主與地支藏干的自動展開留待 v0.2，尚未實作。完整示例見 [examples/ten_gods.py](examples/ten_gods.py)。
+v0.2 的 `get_branch_ten_gods()` 接受 **Day Master Heavenly Stem × Target Earthly Branch**。
+日主由 caller 明確提供；藏干順序不是權重，也不產生地支的單一十神結論。
+完整示例見 [天干十神](examples/ten_gods.py) 與 [地支藏干十神](examples/branch_ten_gods.py)。
 十條規則採用使用者指定的 canonical implementation specification，歷史文獻依據仍標記
 `requires_validation`。尚未加入排盤、日期換算、合沖刑害、個人命理解讀、資料庫、Web UI 或 LLM。

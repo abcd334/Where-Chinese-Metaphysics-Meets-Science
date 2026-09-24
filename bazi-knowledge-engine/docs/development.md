@@ -21,7 +21,8 @@ Where Chinese Metaphysics Meets Science/
     │   └── sources.md
     ├── examples/
     │   ├── inspect_knowledge.py
-    │   └── ten_gods.py
+    │   ├── ten_gods.py
+    │   └── branch_ten_gods.py
     ├── knowledge/
     │   ├── 陰陽/yin_yang.yaml
     │   ├── 五行/five_elements.yaml
@@ -49,6 +50,7 @@ Where Chinese Metaphysics Meets Science/
         ├── test_concepts.py
         ├── test_layer1.py
         ├── test_ten_gods.py
+        ├── test_branch_ten_gods.py
         ├── test_seasonal_context.py
         └── test_loader.py
 ```
@@ -86,6 +88,7 @@ Wheel 包含 knowledge YAML，安裝後不依賴來源 checkout 的工作目錄�
 | `get_concept` | 說明 ID／中文名、天干 ID／中文字、地支中文字或 `branch_` 說明 ID | `Concept` |
 | `get_hidden_stem_season_context` | 地支中文字或 ID | `HiddenStemSeasonContext` |
 | `get_ten_god` | 日主天干、目標天干：各接受中文字或天干 ID | `TenGodResult` |
+| `get_branch_ten_gods` | 日主天干、地支：各接受中文字或所屬集合 ID | `BranchTenGodResult` |
 | `classify_element_relation` | 日主五行、目標五行：各接受中文名或 ID | 五種日主視角的關係分類之一 |
 
 ```python
@@ -309,4 +312,55 @@ ten_gods:
 
 `test_ten_gods.py` 覆蓋壬／甲日主指定案例、100 組配對、每個日主十神各一次、完整 trace、
 不合法輸入／規則／來源，以及修改暫存 YAML 後結論隨資料變動的測試。
-本版不實作地支或藏干的自動十神展開；v0.2 僅列於 TODO。
+此 API 仍只處理兩個天干；地支藏干展開由下列 v0.2 API 組合處理。
+
+## Ten Gods Engine v0.2
+
+```python
+from bazi_knowledge import KnowledgeBase, BranchTenGodResult, get_branch_ten_gods
+
+kb = KnowledgeBase()
+result = kb.get_branch_ten_gods("壬", "戌")
+assert result == get_branch_ten_gods("ren", "xu")
+assert result.branch is kb.get_earthly_branch("戌")
+assert result.hidden_stem_results[0].hidden_stem is kb.get_heavenly_stem("戊")
+assert result.hidden_stem_results[0].ten_god_result.ten_god.name_zh == "七殺"
+assert BranchTenGodResult.model_validate_json(result.model_dump_json()) == result
+```
+
+`get_branch_ten_gods(day_master, branch)` 兩個必要參數只接受字串。
+日主使用 v0.1 天干查詢；地支使用藏干查詢既有的中文字或 ID 規則。
+例如 `("wu", "wu")` 指戊日主與午地支；`("ren", "yin")` 指壬日主與寅地支。
+`branch_xu` 是 Concept ID，不是這個 API 的地支 ID。
+未知或不合範圍的字串拋出 `KeyError`，非字串（含模型物件）拋出 `TypeError`。
+caller 必須提供日主；不接受四柱或日期，不做自動辨識。
+
+| 模型 | 欄位 |
+| --- | --- |
+| `BranchTenGodResult` | `day_master`, `branch`, `hidden_stem_results`, `trace`, `hidden_stem_source_status`, `sources` |
+| `HiddenStemTenGodResult` | `hidden_stem: HeavenlyStem`, `ten_god_result: TenGodResult` |
+
+`hidden_stem_results` 為非空 tuple，順序與 `get_hidden_stems()` 完全相同。
+每個 `ten_god_result` 直接保留 `get_ten_god()` 回傳物件，包含原五步 trace、規則及來源。
+外層沿用 `TraceStep` 保存兩步：`earthly_branches:id → hidden_stems:id` 的 lookup，
+以及 `hidden_stems:id → heavenly_stems:id...` 的 join。輸出引用依藏干順序排列。
+結構化引用是追溯依據；不另外建立一份自然語言判斷邏輯。
+
+藏干 lookup／join 的 `source_ids` 與 `hidden_stem_source_status` 取自既有
+`get_concept("hidden_stems")`。`sources` 包含藏干與所有子結果所用來源的完整去重記錄。
+因此本 API 除基本資料與十神規則外，也會透過既有 Concept loader 載入完整 `concepts/`，
+沿用其來源及跨集合驗證；季節資料不參與十神判斷。
+自訂目錄需要同樣結構，缺檔或驗證失敗直接報錯，不回退至預設資料或回傳部分結果。
+原 v0.1 仍只需要基本資料、十神規則及來源 registry，沒有新增其載入依賴。
+
+全部模型沿用 frozen、禁止額外欄位及 JSON 序列化設定；不新增權重、百分比、氣分類或解讀欄位。
+v0.2 沒有新增 YAML schema 或依賴，藏干與十神規則只有既有資料一份來源。
+
+```powershell
+.venv/Scripts/python.exe -X utf8 examples/branch_ten_gods.py
+.venv/Scripts/python.exe -m pytest -q
+```
+
+`test_branch_ten_gods.py` 覆蓋全部 120 個配對及 280 個子結果與 v0.1 一致、
+中文／ID 相容性、順序、物件重用、trace 引用、來源狀態、JSON 往返及錯誤邊界。
+測試會改動暫存藏干清單及 provenance，確認結果跟隨 YAML，並驗證地支表面分類不影響十神。
