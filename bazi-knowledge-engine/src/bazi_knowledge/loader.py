@@ -1,12 +1,12 @@
 """Read YAML, validate references, and query explicitly stored data."""
 
-from importlib.resources import files
 from math import lcm
 from functools import cached_property
 from pathlib import Path
 from typing import get_args
 
-import yaml
+from ._yaml import _UniqueKeyLoader, _knowledge_root, _read_yaml
+from .interactions import InteractionEngine, StemRelationResult, BranchRelationResult
 
 from .models import (
     Concept, ConceptData, EarthlyBranch, FactReference, HeavenlyStem,
@@ -16,34 +16,6 @@ from .models import (
     BranchTenGodResult, HiddenStemTenGodResult,
     Pillar, PillarPosition, FourPillars, VisibleStemAnalysis, PillarAnalysis, FourPillarsAnalysis,
 )
-
-
-class _UniqueKeyLoader(yaml.SafeLoader):
-    """Reject duplicate YAML keys instead of silently discarding earlier values."""
-
-    def construct_mapping(self, node, deep=False):
-        self.flatten_mapping(node)
-        result = {}
-        for key_node, value_node in node.value:
-            key = self.construct_object(key_node, deep=deep)
-            if key in result:
-                raise ValueError(f"Duplicate YAML key: {key!r} at {key_node.start_mark}")
-            result[key] = self.construct_object(value_node, deep=deep)
-        return result
-
-
-def _knowledge_root(knowledge_dir):
-    if knowledge_dir is not None:
-        return Path(knowledge_dir)
-    root = files("bazi_knowledge").joinpath("knowledge")
-    return root if root.is_dir() else Path(__file__).resolve().parents[2] / "knowledge"
-
-
-def _read_yaml(path):
-    document = yaml.load(path.read_text(encoding="utf-8"), Loader=_UniqueKeyLoader)
-    if not isinstance(document, dict):
-        raise ValueError(f"{path}: expected a YAML mapping")
-    return document
 
 
 def load_knowledge(knowledge_dir: str | Path | None = None) -> KnowledgeData:
@@ -112,6 +84,16 @@ class KnowledgeBase:
     @cached_property
     def ten_gods(self) -> TenGodData:
         return load_ten_gods(self._knowledge_dir)
+
+    @cached_property
+    def interactions(self) -> InteractionEngine:
+        return InteractionEngine.load(self.data, self._knowledge_dir)
+
+    def get_stem_relations(self, first: str, second: str) -> tuple[StemRelationResult, ...]:
+        return self.interactions.get_stem_relations(first, second)
+
+    def get_branch_relations(self, first: str, second: str) -> tuple[BranchRelationResult, ...]:
+        return self.interactions.get_branch_relations(first, second)
 
     def _ten_god_stem(self, key: str) -> HeavenlyStem:
         if not isinstance(key, str):
@@ -439,6 +421,14 @@ class KnowledgeBase:
 
 def get_heavenly_stem(char: str) -> HeavenlyStem:
     return KnowledgeBase().get_heavenly_stem(char)
+
+
+def get_stem_relations(first: str, second: str) -> tuple[StemRelationResult, ...]:
+    return KnowledgeBase().get_stem_relations(first, second)
+
+
+def get_branch_relations(first: str, second: str) -> tuple[BranchRelationResult, ...]:
+    return KnowledgeBase().get_branch_relations(first, second)
 
 
 def get_ten_god(day_master: str, target: str) -> TenGodResult:

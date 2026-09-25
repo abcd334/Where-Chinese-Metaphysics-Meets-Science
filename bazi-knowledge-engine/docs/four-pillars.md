@@ -128,7 +128,8 @@ Layer 2 子結果與 trace 保留原物件，不壓成中文一句話。
 
 ## v0.1 的邊界
 
-目前沒有權重、百分比、主中餘氣、月令、旺衰、干支合沖刑害、格局或個人命理解讀。
+四柱分析目前沒有權重、百分比、主中餘氣、月令、旺衰、格局或個人命理解讀。
+Layer 2 已有五合、六合與六沖的兩成員查詢；本 API 尚未自動掃描或加入其結果。
 Hidden stem weighting and qi classification require separate source validation.
 現有季節 API 繼續存在，但不參與四柱 v0.1 的計算。
 本次停在已知四柱的結構分析；Four Pillars v0.2 尚未實作。

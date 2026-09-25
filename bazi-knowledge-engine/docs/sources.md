@@ -48,6 +48,7 @@
 | `hko_order`、`ndl_elements` | 對應上述公開干支分類資料。 |
 | `branch_polarity` | 對應既有 `branch-polarity`；把原文件中的待覆核來源登錄為可查詢引用。個別地支說明保留 `requires_validation`。 |
 | `ten_gods_v01_spec` | 2026-09-24 使用者 Ten Gods v0.1 canonical implementation specification，涵蓋十條對應、名稱、方向定義、陰陽比較及七殺／偏官別名；不是古籍引文。 |
+| `pairwise_v01_spec` | 2026-09-25 使用者指定天干五合 5 組、地支六合 6 組及六沖 6 組，僅表示無方向的關係存在；不是古籍引文。 |
 
 檔首代號使用連字號，程式來源 ID 使用底線，保留既有命名以避免破壞引用。
 `phase1`／`phase2` 表示原始規格來源，不是現在的架構層名稱。
@@ -121,3 +122,17 @@ v0.2 組合既有藏干引用與 v0.1 規則，沒有新增傳統對應、規則
 不新增 citation 或 SourceStatus 類型，也不將通過程式測試等同歷史或自然因果驗證。
 四柱外層 trace 的 `sexagenary_cycle:index` 表示已通過這項計算，沿用 implementation convention 的空 source_ids；
 所有 Layer 2 十神及藏干來源狀態保持不變。
+
+## Pairwise Interaction v0.1 的採用依據
+
+兩份 [天干規則](../knowledge/stem_relations.yaml)／[地支規則](../knowledge/branch_relations.yaml)
+採用本次使用者列出的 17 個 canonical 配對。
+`pairwise_v01_spec` 登錄於現有 sources.yaml，URL 為 null；核對日期只表示與使用者規格比對。
+每條規則均有 `source_ids` 及 `source_status: requires_validation`。
+
+**Requires source validation**：尚未指定支持完整清單的歷史文獻版本；沒有自行添加網路 citation。
+配對存在不支持合化元素、是否化、力量、好壞或吉凶。那些條件不在此資料或 API 的可推論範圍。
+結果保留原規則及其狀態，trace 指向具體 rule ID；查詢或測試通過不會升格成已完成文獻考證。
+
+Knowledge Quality / Research Track 平行維護十神與關係資料的文獻核對；
+功能開發可依採用的 canonical 規格前進，同時明確保留來源限制。

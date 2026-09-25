@@ -83,4 +83,4 @@ assert result.day_master.char == "壬"
 
 公式採用本次使用者實作規格，未另作歷史文獻核對：Requires source validation。
 原基本資料來源與待驗證狀態仍保留，沒有新增虛構引文。
-目前完成六十甲子驗證；後續天干／地支互動及 Four Pillars v0.2 只列入 [roadmap](../TODO.md)。
+目前另有 Layer 2 Pairwise v0.1；Four Pillars v0.2 自動掃描仍只列入 [roadmap](../TODO.md)。

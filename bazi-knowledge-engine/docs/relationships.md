@@ -7,6 +7,71 @@
 第二層另有 [Sexagenary Cycle v0.1](sexagenary-cycle.md)：由天干／地支順序生成合法干支配對。
 已知四柱的日主選取與逐柱分析由第三層組合這些 API，詳見[四柱結構 v0.1](four-pillars.md)。
 
+## Pairwise Interaction Engine v0.1
+
+**Status: implemented**。只接受兩個天干或兩個地支，查詢固定配對關係的存在。
+資料採本次使用者 canonical 清單，全部保留 `requires_validation`；未完成指定歷史文獻版本核對。
+
+| 領域 | relation | 中文名稱 | 無方向配對 |
+| --- | --- | --- | --- |
+| 天干 | `combine` | 天干五合 | 甲己、乙庚、丙辛、丁壬、戊癸 |
+| 地支 | `six_harmony` | 地支六合 | 子丑、寅亥、卯戌、辰酉、巳申、午未 |
+| 地支 | `clash` | 地支六沖 | 子午、丑未、寅申、卯酉、辰戌、巳亥 |
+
+這裡的關係不包含合化元素、合化成立條件、權重或吉凶。「合」與「沖」不被換成好壞結論。
+
+```python
+from bazi_knowledge import KnowledgeBase
+
+kb = KnowledgeBase()
+result, = kb.get_stem_relations("丙", "辛")
+assert result.rule.id == "stem_combine_bing_xin"
+assert result.rule.relation == "combine"
+assert result == kb.get_stem_relations("bing", "xin")[0]
+assert kb.get_stem_relations("辛", "丙")[0].rule is result.rule
+assert kb.get_branch_relations("卯", "戌")[0].rule.relation == "six_harmony"
+assert kb.get_branch_relations("辰", "戌")[0].rule.relation == "clash"
+assert kb.get_branch_relations("寅", "卯") == ()
+```
+
+結果為 tuple，沒有命中回傳空 tuple；相同成員與自己查詢也沒有關係。
+查詢順序不影響命中規則，`result.members` 保留 caller 輸入順序；
+`result.rule.members` 則是 YAML 原成員順序，二者不代表方向或力量。
+不存在／跨集合的字串拋出 `KeyError`，非字串拋出 `TypeError`。
+ID 按 API 集合解讀：天干 `wu` 是戊，地支 `wu` 是午，地支 `yin` 是寅。
+
+規則存於 [stem_relations.yaml](../knowledge/stem_relations.yaml) 與
+[branch_relations.yaml](../knowledge/branch_relations.yaml)。例如：
+
+```yaml
+stem_relations:
+  - id: stem_combine_bing_xin
+    relation: combine
+    members: [bing, xin]
+    source_ids: [pairwise_v01_spec]
+    source_status:
+      value: requires_validation
+      note: 使用者指定配對，歷史文獻版本尚待核對。
+```
+
+`rule` 即實際命中的 YAML 規則，`rule.id` 是追溯用的規則 ID。
+每個結果的 trace 沿用 `TraceStep`：
+
+```text
+lookup:
+  input_refs: [heavenly_stems:bing, heavenly_stems:xin]
+  output_refs: [stem_relations:stem_combine_bing_xin]
+  source_ids: [pairwise_v01_spec]
+```
+
+地支使用 `earthly_branches`／`branch_relations` 引用；成員直接引用基本物件。
+`sources` 保存實際所用來源的完整記錄，`rule.source_status` 原樣保留。
+這是固定配對查詢，所以一個結構化 lookup 已表達判斷依據，不虛構五行生剋推導。
+
+本版不查藏干間互動、不接受命盤、不帶柱位置，也不讓 Four Pillars 自動掃描。
+後續 Four Pillars v0.2 才會組合查詢並標記 year／month／day／hour。
+範例：[examples/interactions.py](../examples/interactions.py)；模型與載入契約見[開發參考](development.md#pairwise-interaction-engine-v01)。
+
 ## 五行相生與相剋
 
 相生、相剋是有方向的關係名稱；本階段不把「生」等同好事，或把「剋」等同壞事。

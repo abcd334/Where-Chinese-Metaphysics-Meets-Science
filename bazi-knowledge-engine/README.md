@@ -17,7 +17,8 @@ v1.0 凍結目前的基本分類、引用方式與查詢契約；待考據的來
    陰陽、五行、天干、地支：基本屬性＋白話說明
         ↓ 被引用
 2. 關係／組合規則
-   生剋、藏干、季節關聯、Ten Gods v0.2、六十甲子；合沖刑害尚未實作
+   生剋、藏干、季節關聯、Ten Gods v0.2、六十甲子、Pairwise v0.1
+   Pairwise：天干五合、地支六合／六沖
         ↓ 組合既有規則
 3. 命盤結構 — Four Pillars Structure v0.1 implemented
    已知四柱：日主、明干十神、藏干十神（Structural analysis only）
@@ -39,6 +40,9 @@ Structural analysis only. 不換算出生日期，不判斷力量或作個人命
 **Sexagenary Cycle v0.1 · Status: implemented**：依既有天干與地支順序循環產生 60 個配對，
 並在四柱分析前驗證每柱的合法性。
 目前尚未實作通用 Rule Engine。
+**Pairwise Interaction Engine v0.1 · Status: implemented**：以 5 條天干五合、6 條地支六合及
+6 條地支六沖 YAML 規則提供無方向的兩兩查詢，只記錄關係存在。
+不計算合化、不判斷吉凶，也尚未讓 Four Pillars 自動掃描。
 四層是責任分工，不代表四層都已完成，也不要求依層號刪除已存在的功能。
 
 ## 文件導覽
@@ -48,6 +52,7 @@ Structural analysis only. 不換算出生日期，不判斷力量或作個人命
 | 陰陽、五行、每個天干和地支是什麼？ | [基礎元素入門](docs/basic-elements.md) |
 | 四層如何分工？哪些已完成？ | [架構與目前範圍](docs/architecture.md) |
 | 生剋、藏干、四季與十神如何查詢？ | [關係資料](docs/relationships.md) |
+| 天干五合、地支六合／六沖如何查詢？ | [Pairwise v0.1](docs/relationships.md#pairwise-interaction-engine-v01) |
 | 已知四柱如何取得日主、明干與藏干十神？ | [四柱結構 v0.1](docs/four-pillars.md) |
 | 如何產生六十甲子、驗證干支配對與查詢序號？ | [六十甲子 v0.1](docs/sexagenary-cycle.md) |
 | 如何安裝、查詢、修改 YAML 與執行測試？ | [開發參考](docs/development.md) |
@@ -125,4 +130,17 @@ v0.2 的 `get_branch_ten_gods()` 接受 **Day Master Heavenly Stem × Target Ear
 日主由 caller 明確提供；藏干順序不是權重，也不產生地支的單一十神結論。
 完整示例見 [天干十神](examples/ten_gods.py) 與 [地支藏干十神](examples/branch_ten_gods.py)。
 十條規則採用使用者指定的 canonical implementation specification，歷史文獻依據仍標記
-`requires_validation`。尚未加入排盤、日期換算、合沖刑害、個人命理解讀、資料庫、Web UI 或 LLM。
+`requires_validation`。尚未加入排盤、日期換算、刑害破、三合三會、個人命理解讀、資料庫、Web UI 或 LLM。
+
+```python
+match, = kb.get_stem_relations("丙", "辛")
+assert match.rule.relation == "combine"
+assert match.rule.id == "stem_combine_bing_xin"
+assert kb.get_branch_relations("卯", "戌")[0].rule.relation == "six_harmony"
+assert kb.get_branch_relations("辰", "戌")[0].rule.relation == "clash"
+assert kb.get_branch_relations("寅", "卯") == ()
+```
+
+查詢亦接受 stable ID；相反輸入順序命中同一規則。結果包含原始成員、規則、來源與結構化 trace。
+17 條規則採用使用者指定清單，歷史文獻版本仍標記 `requires_validation`。
+範例見 [examples/interactions.py](examples/interactions.py)。

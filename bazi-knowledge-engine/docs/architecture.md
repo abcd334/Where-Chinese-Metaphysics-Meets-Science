@@ -39,7 +39,8 @@ v1.0 Freeze 固定這個範圍、schema 與查詢契約。來源版本仍待覆�
 | Ten Gods Engine v0.1 | 已實作：日主天干 × 目標天干，十條 YAML 規則與結構化 trace |
 | Ten Gods Engine v0.2 | 已實作：明確日主 × 地支，依序取得各藏干的 v0.1 結果及來源 |
 | Sexagenary Cycle v0.1 | 已實作：依天干與地支 order 生成 60 個配對，提供合法性與 1-based 序號查詢 |
-| 合沖刑害 | 尚未實作 |
+| Pairwise Interaction Engine v0.1 | 已實作：五合 5、六合 6、六沖 6；明確兩成員查詢 |
+| 刑／害／破、三合／三會 | 尚未實作 |
 | 通用條件式規則引擎 | 尚未實作 |
 
 固定關係表與可執行推理規則都屬於這一層，但兩者的完成狀態不同。
@@ -68,6 +69,12 @@ v0.2 是第二層既有能力的組合，不新增規則 YAML 或另一套十神
 五行生剋可以在入門時一併介紹，但在架構上屬第二層。
 藏干也歸第二層，引用第一層天干；不複製天干的五行或陰陽。
 
+Pairwise v0.1 由 `interactions.py` 獨立承擔規則模型、引用驗證與無方向匹配。
+`KnowledgeBase.interactions` 首次查詢才載入兩份規則 YAML 及共用來源 registry；
+既有 `_UniqueKeyLoader`、知識目錄定位與讀取函式移至 `_yaml.py` 共用，讀取行為不變。
+`get_stem_relations()`／`get_branch_relations()` 是薄的委派入口，不建立通用 Rule Engine。
+結果只表示該配對命中哪條規則，不包含合化元素、條件力量、吉凶或柱位置。
+
 ## 三、命盤結構
 
 **Layer 3 — Four Pillars Structure v0.1 · Status: implemented**
@@ -90,7 +97,7 @@ v0.2 是第二層既有能力的組合，不新增規則 YAML 或另一套十神
 外層 trace 保存四柱位置與日主選取，嵌套結果保留既有規則 trace 和來源狀態。
 
 單柱六十甲子配對已驗證；年／月及日／時之間的曆法配柱、日期可實現性仍不驗證。
-不排盤、不做日期轉四柱，沒有權重、旺衰、干支互動或解讀。
+不排盤、不做日期轉四柱，沒有權重、旺衰或解讀；目前不自動掃描 Layer 2 pairwise 關係。
 完整輸入契約、模型與範例見 [四柱結構](four-pillars.md)。
 
 ## 四、命理解讀
@@ -112,8 +119,9 @@ v0.2 是第二層既有能力的組合，不新增規則 YAML 或另一套十神
 | 第二層十神規則 | `knowledge/ten_gods.yaml`；由既有 `KnowledgeBase` 載入與推導 |
 | 第二層季節關聯及關係說明 | `knowledge/concepts/seasons.yaml`、`hidden_stems.yaml` 等 |
 | 第二層六十甲子生成與驗證 | `KnowledgeBase.generate_sexagenary_cycle()`；從基本資料 order 推導，不新增 YAML 表 |
+| 第二層 Pairwise 關係 | `knowledge/stem_relations.yaml`、`branch_relations.yaml`；`interactions.py` 載入及查詢 |
 | 第三層四柱結構 | `models.py` 的四柱模型、`KnowledgeBase.analyze_four_pillars()`；不新增知識 YAML |
-| 共用載入、驗證與來源 | 既有 `loader.py`、`models.py`、`knowledge/concepts/sources.yaml` |
+| 共用載入、驗證與來源 | `_yaml.py`、既有 `loader.py`／`models.py`、`knowledge/concepts/sources.yaml` |
 
 檔案位置不等於架構層。一個檔案可以包含元素說明和相關關係說明。
 `Concept`、`ConceptData`、`fact_ref` 是現有程式／schema 名稱，繼續保留以維持相容性；

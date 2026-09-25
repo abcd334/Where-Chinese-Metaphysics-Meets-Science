@@ -26,7 +26,8 @@ Where Chinese Metaphysics Meets Science/
     │   ├── ten_gods.py
     │   ├── branch_ten_gods.py
     │   ├── four_pillars.py
-    │   └── sexagenary_cycle.py
+    │   ├── sexagenary_cycle.py
+    │   └── interactions.py
     ├── knowledge/
     │   ├── 陰陽/yin_yang.yaml
     │   ├── 五行/five_elements.yaml
@@ -34,6 +35,8 @@ Where Chinese Metaphysics Meets Science/
     │   ├── 地支/earthly_branches.yaml
     │   ├── hidden_stems.yaml
     │   ├── ten_gods.yaml
+    │   ├── stem_relations.yaml
+    │   ├── branch_relations.yaml
     │   └── concepts/
     │       ├── sources.yaml
     │       ├── seasons.yaml
@@ -45,6 +48,8 @@ Where Chinese Metaphysics Meets Science/
     ├── src/bazi_knowledge/
     │   ├── __init__.py
     │   ├── loader.py
+    │   ├── _yaml.py
+    │   ├── interactions.py
     │   └── models.py
     └── tests/
         ├── test_five_elements.py
@@ -57,6 +62,7 @@ Where Chinese Metaphysics Meets Science/
         ├── test_branch_ten_gods.py
         ├── test_four_pillars.py
         ├── test_sexagenary_cycle.py
+        ├── test_interactions.py
         ├── test_seasonal_context.py
         └── test_loader.py
 ```
@@ -99,6 +105,8 @@ Wheel 包含 knowledge YAML，安裝後不依賴來源 checkout 的工作目錄�
 | `generate_sexagenary_cycle` | 無參數 | 有序 `tuple[Pillar, ...]`，60 筆 |
 | `is_valid_pillar` | 中文干支字串 | `bool`；非字串拋出 `TypeError` |
 | `get_sexagenary_index` | 合法中文干支字串 | 1–60 的整數；非法字串拋出 `ValueError` |
+| `get_stem_relations` | 兩個天干中文字或 ID | `tuple[StemRelationResult, ...]` |
+| `get_branch_relations` | 兩個地支中文字或 ID | `tuple[BranchRelationResult, ...]` |
 | `classify_element_relation` | 日主五行、目標五行：各接受中文名或 ID | 五種日主視角的關係分類之一 |
 
 ```python
@@ -203,7 +211,7 @@ Loader 保留清單順序，pytest 核對採用的完整對應與順序。不接
 因此 `load_concepts()` 提供原始說明，`get_concept()` 提供含基本分類的完整說明。
 查詢保留原 `source_ids` 與 `source_status`，不以 `derived_from_facts` 蓋掉地支的待驗證狀態。
 
-`ConceptData` 合併七份說明資料，含 28 筆儲存的說明、12 筆共用來源、4 季及 12 筆地支季節位置。
+`ConceptData` 合併七份說明資料，含 28 筆儲存的說明、13 筆共用來源、4 季及 12 筆地支季節位置。
 十干動態介紹不算在這 28 筆中。驗證包含 ID／名稱唯一、來源引用、基本資料引用與季節位置完整性，
 並要求十二支說明全部有引用，且中文名與引用的地支一致。
 Schema 能檢查形狀和引用，不能自動判斷所有自然語言內容是否越界，文字仍需人工審閱。
@@ -218,7 +226,7 @@ Schema 能檢查形狀和引用，不能自動判斷所有自然語言內容是�
 `KnowledgeBase.concepts` 首次使用才載入並保存在該實例中；不查詢說明時不需要 `concepts/` 目錄。
 說明查詢缺檔會明確報錯，不回退到其他資料目錄。
 
-同一 YAML reader 使用 SafeLoader 子類並拒絕重複 key。
+同一 YAML reader 使用 SafeLoader 子類並拒絕重複 key，現位於 `_yaml.py`，由既有與新領域共用。
 
 | 問題 | 錯誤 |
 | --- | --- |
@@ -426,3 +434,65 @@ API 先透過原 `get_heavenly_stem()`、`get_earthly_branch()` 驗證全部四�
 .venv/Scripts/python.exe -X utf8 examples/sexagenary_cycle.py
 .venv/Scripts/python.exe -m pytest -q
 ```
+
+## Pairwise Interaction Engine v0.1
+
+`interactions.py` 是具體的兩成員關係領域，包含模型、規則載入、驗證與查詢。
+沿用 `DataModel`、`Identifier`、`Source`、`SourceStatus`、`TraceStep` 及基本干支物件。
+共用 YAML reader 僅從 `loader.py` 原樣抽出；舊載入函式與查詢契約不變。
+沒有新 dependency、第二套五行表、通用條件引擎或四柱掃描。
+
+### 規則與結果 schema
+
+| 模型 | 欄位 |
+| --- | --- |
+| `StemRelation` | `id`, `relation: combine`, `members`（恰好兩個天干 ID）, `source_ids`, `source_status` |
+| `BranchRelation` | `id`, `relation: six_harmony \| clash`, `members`（恰好兩個地支 ID）, `source_ids`, `source_status` |
+| `InteractionData` | `stem_relations`, `branch_relations`, `sources` |
+| `StemRelationResult` | `rule: StemRelation`, `members: tuple[HeavenlyStem, HeavenlyStem]`, `trace`, `sources` |
+| `BranchRelationResult` | `rule: BranchRelation`, `members: tuple[EarthlyBranch, EarthlyBranch]`, `trace`, `sources` |
+
+兩份 YAML 分別只提供 `stem_relations` 與 `branch_relations`，來源仍存於共用 registry。
+`PairwiseRule` 僅共用規則欄位，Python 不存配對常數。匹配以成員 ID 的無序集合比較，
+結果依 YAML 規則順序排列；members 物件依 caller 輸入順序排列。
+未命中（包含同一成員重複查詢）回傳空 tuple；不把未命中當成吉凶或其他關係。
+
+載入時驗證：
+
+- 五合恰 5 條，六合／六沖各 6 條；全域 rule ID 唯一。
+- 每條恰兩個不同成員，引用必須存在於所屬天干或地支集合。
+- 同類型無方向配對唯一；同類型內每個干或支恰出現一次，避免漏掉成員。
+- 來源 ID 清單非空且不重複，所有 ID 均能在唯一的來源 registry 中解析。
+- source status 使用既有列舉與說明；拒絕額外欄位，例如 transformation／weight／fortune。
+
+配對是否與採用清單一致由 canonical 測試驗收；schema 不硬編碼 17 個配對。
+
+```python
+from bazi_knowledge import KnowledgeBase, StemRelationResult, get_stem_relations
+
+kb = KnowledgeBase()
+result, = kb.get_stem_relations("bing", "xin")
+assert result == get_stem_relations("丙", "辛")[0]
+assert result.members[0] is kb.get_heavenly_stem("丙")
+assert result.rule.source_status.value == "requires_validation"
+assert StemRelationResult.model_validate_json(result.model_dump_json()) == result
+```
+
+`KnowledgeBase.interactions` 是延遲載入的 `InteractionEngine`，其 `.data` 提供已驗證的完整規則。
+首次 pairwise 查詢會讀取兩份規則檔與 `concepts/sources.yaml`，不讀其他 Concept／季節／十神檔案。
+缺檔或壞資料直接報錯，不回退預設資料。相對自訂目錄沿用 KnowledgeBase 的絕對路徑定位。
+未使用 pairwise API 時不需要這兩份新規則檔；Four Pillars v0.1 也不觸發它們。
+兩個 API 均有 module-level wrapper；參數非字串為 TypeError，未知或跨集合字串為 KeyError。
+
+結果 frozen、tuple 且可 JSON 往返；`trace` 為一個 lookup，基本成員引用指向規則引用，
+`source_ids` 取自原規則，`sources` 回傳該規則使用的完整來源記錄。
+沒有重新計算藏干／十神，也沒有替關係加入自然語言推論。
+
+```powershell
+.venv/Scripts/python.exe -X utf8 examples/interactions.py
+.venv/Scripts/python.exe -m pytest -q
+```
+
+`test_interactions.py` 窮舉 100 個天干、144 個地支有序輸入，包含 17 條規則的正反方向、
+無關及同成員查詢。另驗證來源與物件引用、JSON、壞 YAML／規則拒絕、自訂資料改動生效、
+延遲載入，以及原四柱功能不自動查詢 pairwise 關係。

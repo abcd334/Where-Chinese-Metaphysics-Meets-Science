@@ -1,0 +1,37 @@
+# Unordered pair membership only; no transformation or interpretation.
+stem_relations:
+  - id: stem_combine_jia_ji
+    relation: combine
+    members: [jia, ji]
+    source_ids: [pairwise_v01_spec]
+    source_status:
+      value: requires_validation
+      note: "採用使用者 Pairwise Interaction v0.1 指定配對；歷史文獻版本尚待核對，只記錄關係存在。"
+  - id: stem_combine_yi_geng
+    relation: combine
+    members: [yi, geng]
+    source_ids: [pairwise_v01_spec]
+    source_status:
+      value: requires_validation
+      note: "採用使用者 Pairwise Interaction v0.1 指定配對；歷史文獻版本尚待核對，只記錄關係存在。"
+  - id: stem_combine_bing_xin
+    relation: combine
+    members: [bing, xin]
+    source_ids: [pairwise_v01_spec]
+    source_status:
+      value: requires_validation
+      note: "採用使用者 Pairwise Interaction v0.1 指定配對；歷史文獻版本尚待核對，只記錄關係存在。"
+  - id: stem_combine_ding_ren
+    relation: combine
+    members: [ding, ren]
+    source_ids: [pairwise_v01_spec]
+    source_status:
+      value: requires_validation
+      note: "採用使用者 Pairwise Interaction v0.1 指定配對；歷史文獻版本尚待核對，只記錄關係存在。"
+  - id: stem_combine_wu_gui
+    relation: combine
+    members: [wu, gui]
+    source_ids: [pairwise_v01_spec]
+    source_status:
+      value: requires_validation
+      note: "採用使用者 Pairwise Interaction v0.1 指定配對；歷史文獻版本尚待核對，只記錄關係存在。"

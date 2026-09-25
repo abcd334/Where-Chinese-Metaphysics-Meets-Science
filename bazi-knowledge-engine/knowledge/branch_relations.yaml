@@ -1,0 +1,86 @@
+# Unordered pair membership only; no transformation or interpretation.
+branch_relations:
+  - id: branch_six_harmony_zi_chou
+    relation: six_harmony
+    members: [zi, chou]
+    source_ids: [pairwise_v01_spec]
+    source_status:
+      value: requires_validation
+      note: "採用使用者 Pairwise Interaction v0.1 指定配對；歷史文獻版本尚待核對，只記錄關係存在。"
+  - id: branch_six_harmony_yin_hai
+    relation: six_harmony
+    members: [yin, hai]
+    source_ids: [pairwise_v01_spec]
+    source_status:
+      value: requires_validation
+      note: "採用使用者 Pairwise Interaction v0.1 指定配對；歷史文獻版本尚待核對，只記錄關係存在。"
+  - id: branch_six_harmony_mao_xu
+    relation: six_harmony
+    members: [mao, xu]
+    source_ids: [pairwise_v01_spec]
+    source_status:
+      value: requires_validation
+      note: "採用使用者 Pairwise Interaction v0.1 指定配對；歷史文獻版本尚待核對，只記錄關係存在。"
+  - id: branch_six_harmony_chen_you
+    relation: six_harmony
+    members: [chen, you]
+    source_ids: [pairwise_v01_spec]
+    source_status:
+      value: requires_validation
+      note: "採用使用者 Pairwise Interaction v0.1 指定配對；歷史文獻版本尚待核對，只記錄關係存在。"
+  - id: branch_six_harmony_si_shen
+    relation: six_harmony
+    members: [si, shen]
+    source_ids: [pairwise_v01_spec]
+    source_status:
+      value: requires_validation
+      note: "採用使用者 Pairwise Interaction v0.1 指定配對；歷史文獻版本尚待核對，只記錄關係存在。"
+  - id: branch_six_harmony_wu_wei
+    relation: six_harmony
+    members: [wu, wei]
+    source_ids: [pairwise_v01_spec]
+    source_status:
+      value: requires_validation
+      note: "採用使用者 Pairwise Interaction v0.1 指定配對；歷史文獻版本尚待核對，只記錄關係存在。"
+  - id: branch_clash_zi_wu
+    relation: clash
+    members: [zi, wu]
+    source_ids: [pairwise_v01_spec]
+    source_status:
+      value: requires_validation
+      note: "採用使用者 Pairwise Interaction v0.1 指定配對；歷史文獻版本尚待核對，只記錄關係存在。"
+  - id: branch_clash_chou_wei
+    relation: clash
+    members: [chou, wei]
+    source_ids: [pairwise_v01_spec]
+    source_status:
+      value: requires_validation
+      note: "採用使用者 Pairwise Interaction v0.1 指定配對；歷史文獻版本尚待核對，只記錄關係存在。"
+  - id: branch_clash_yin_shen
+    relation: clash
+    members: [yin, shen]
+    source_ids: [pairwise_v01_spec]
+    source_status:
+      value: requires_validation
+      note: "採用使用者 Pairwise Interaction v0.1 指定配對；歷史文獻版本尚待核對，只記錄關係存在。"
+  - id: branch_clash_mao_you
+    relation: clash
+    members: [mao, you]
+    source_ids: [pairwise_v01_spec]
+    source_status:
+      value: requires_validation
+      note: "採用使用者 Pairwise Interaction v0.1 指定配對；歷史文獻版本尚待核對，只記錄關係存在。"
+  - id: branch_clash_chen_xu
+    relation: clash
+    members: [chen, xu]
+    source_ids: [pairwise_v01_spec]
+    source_status:
+      value: requires_validation
+      note: "採用使用者 Pairwise Interaction v0.1 指定配對；歷史文獻版本尚待核對，只記錄關係存在。"
+  - id: branch_clash_si_hai
+    relation: clash
+    members: [si, hai]
+    source_ids: [pairwise_v01_spec]
+    source_status:
+      value: requires_validation
+      note: "採用使用者 Pairwise Interaction v0.1 指定配對；歷史文獻版本尚待核對，只記錄關係存在。"

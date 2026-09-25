@@ -16,7 +16,10 @@ from .loader import (
     get_branch_ten_gods,
     analyze_four_pillars,
     generate_sexagenary_cycle, is_valid_pillar, get_sexagenary_index,
+    get_stem_relations, get_branch_relations,
 )
+
+from .interactions import StemRelation, BranchRelation, InteractionData, StemRelationResult, BranchRelationResult
 from .models import (
     EarthlyBranch, Element, ElementRelation, HeavenlyStem, HiddenStemSet, KnowledgeData, YinYang,
     Concept, ConceptData, Source, SourceStatus, TraditionalAssociation, HiddenStemSeasonContext,
@@ -38,4 +41,6 @@ __all__ = [
     "Pillar", "FourPillars", "VisibleStemAnalysis", "PillarAnalysis", "FourPillarsAnalysis",
     "analyze_four_pillars",
     "generate_sexagenary_cycle", "is_valid_pillar", "get_sexagenary_index",
+    "get_stem_relations", "get_branch_relations", "StemRelation", "BranchRelation",
+    "InteractionData", "StemRelationResult", "BranchRelationResult",
 ]

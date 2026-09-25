@@ -29,6 +29,7 @@ Freeze 固定目前範圍與查詢契約，不把未驗證說法升格成已驗�
 | 關係規則 | 從四季生成完整藏干表 | `get_concept("hidden_stems_seasons")` 只保留關聯；完整推導需額外前提、版本與反例，不改指定清單。 |
 | 關係規則 | 藏干權重與氣分類 | Hidden stem weighting and qi classification require separate source validation. |
 | 關係規則 | 十神完整對應、名稱與七殺／偏官別名 | `ten_gods_v01_spec` 為使用者實作規格；十條規則均標記 `requires_validation`，尚未指定歷史文獻版本。 |
+| 關係規則 | 五合、六合、六沖的歷史文獻版本 | `pairwise_v01_spec` 為使用者 canonical 清單；17 條規則維持 `requires_validation`，不支持合化或吉凶推論。 |
 
 寅對應春、木對應春，不能單靠這兩項資料推出寅還藏丙與戊，更不能決定順序或比例。
 現有 API 的藏干來自指定清單。《三命通會》〈論人元司事〉並列不同安排；
@@ -83,14 +84,28 @@ Ten Gods v0.2 的明確日主輸入契約保持不變；四柱組合由第三層
 - [x] 排序依 YAML order、來源物件重用、非法輸入、邊界序號與既有 API 回歸測試。
 
 採用使用者本次循環配對規格；歷史文獻支持範圍未另外考據，不新增假 citation。
-本次停在配對驗證，尚未實作 `next_pillar()`、干支互動或 Four Pillars v0.2。
+六十甲子範圍保持配對驗證；`next_pillar()` 與 Four Pillars v0.2 仍未實作。
+
+## Layer 2 — Pairwise Interaction Engine v0.1
+
+**Status: implemented**
+
+- [x] 天干五合 5 條、地支六合 6 條、地支六沖 6 條，配對與來源保存在 YAML。
+- [x] `get_stem_relations()`／`get_branch_relations()` 支援中文字與所屬集合 ID。
+- [x] 無方向匹配，反向查詢同一規則；結果保留輸入順序與原基本物件。
+- [x] 規則數量、唯一 ID、無序配對去重、成員／來源引用、每類成員覆蓋均驗證。
+- [x] `interactions.py` 負責載入、驗證與查詢；KnowledgeBase 只委派，共用既有嚴格 YAML reader。
+- [x] 100 種天干與 144 種地支有序輸入、JSON、trace、異常資料及舊 API 隔離均有測試。
+- [x] 17 條規則的 `requires_validation` 原樣保留；沒有合化、力量、解讀或四柱掃描。
 
 ## Roadmap：尚未開始的工作
 
-下一步可先核對十神名稱與對應的指定文獻版本，記錄差異及適用範圍。
-1. Heavenly Stem Relationships：先定義天干五合的來源、前提與規則。
-2. Earthly Branch Relationships：先六合／六沖，再刑害破，最後三合／三會；逐項規劃來源與驗收。
-3. Four Pillars v0.2：重用完成的 Layer 2 規則，掃描四柱內部關係並保留追溯。
-4. 月令／旺衰、格局／喜用及 Interpretation：另訂流派、前提與驗證邊界。
+1. Four Pillars v0.2：重用 Pairwise API，掃描六組天干與六組地支配對，保留柱位置及規則來源。
+2. Interaction Engine v0.2：另定害／破／刑的成員數量、來源與前提。
+3. Multi-member Interaction Engine：另定三合／三會，不強塞到兩成員模型。
+4. 月令／旺衰／強弱 → 格局／喜用 → Interpretation：另訂流派、前提與驗證邊界。
 
-以上均為未實作方向，需另訂來源、前提與驗收規格，不由此次六十甲子工作自動延伸。
+Knowledge Quality / Research Track 平行維護十神及各關係規則的歷史文獻核對與差異紀錄；
+考據不是目前唯一功能優先項目，也不因新功能完成而解除待驗證狀態。
+
+以上均為未實作方向，需另訂來源、前提與驗收規格。本次完成 Pairwise v0.1 後停止。

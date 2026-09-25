@@ -1,4 +1,10 @@
 sources:
+  - id: pairwise_v01_spec
+    title: "Pairwise Interaction v0.1 — user-supplied canonical implementation specification"
+    url: null
+    locator: "2026-09-25 使用者天干五合、地支六合與六沖清單；knowledge/stem_relations.yaml；knowledge/branch_relations.yaml"
+    scope: "僅採用 5＋6＋6 個無方向配對的存在關係。Requires source validation：歷史文獻版本待核對；不支持合化、力量、吉凶或四柱自動掃描。"
+    checked_on: "2026-09-25"
   - id: "ten_gods_v01_spec"
     title: "Ten Gods v0.1 — user-supplied canonical implementation specification"
     url: null
