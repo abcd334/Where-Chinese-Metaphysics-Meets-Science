@@ -1,5 +1,11 @@
 # Explainable Bazi Knowledge Engine
 
+**Technical guide · [Portfolio overview / 成果展示](../README.md)**
+
+Turning ambiguous domain knowledge into structured rules, validation controls and traceable execution.
+本專案以 Solution Design 為展示主軸：問題定義、資料與規則建模、驗證與例外邊界，再到可操作的執行流程。
+本頁保留安裝、API 與知識層文件入口；設計思路、完整案例、實際介面截圖與架構請見 repository 首頁。
+
 **Product Slice v0.1 · 可操作的 Streamlit MVP 已完成。**
 輸入已知四柱，查看日主、明干十神、藏干十神、天干五合與地支六合／六沖，並展開推理及來源。
 
