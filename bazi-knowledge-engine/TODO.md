@@ -70,7 +70,7 @@ Ten Gods v0.2 的明確日主輸入契約保持不變；四柱組合由第三層
 
 四柱位置與日主選取採本次使用者規格的 implementation convention，沒有新增古籍引文。
 四柱解析現已接入下列六十甲子驗證；年／月／日時配柱及日期可實現性仍不處理。
-本次完成 v0.1 後停止；不加入權重、月令、旺衰、干支互動或命理解讀。
+原 v0.1 的明干／藏干結構保持不變；目前已由 Product Slice 加上 pairwise 掃描，沒有权重、月令、旺衰或命理解讀。
 
 ## Layer 2 — Sexagenary Cycle v0.1
 
@@ -84,7 +84,7 @@ Ten Gods v0.2 的明確日主輸入契約保持不變；四柱組合由第三層
 - [x] 排序依 YAML order、來源物件重用、非法輸入、邊界序號與既有 API 回歸測試。
 
 採用使用者本次循環配對規格；歷史文獻支持範圍未另外考據，不新增假 citation。
-六十甲子範圍保持配對驗證；`next_pillar()` 與 Four Pillars v0.2 仍未實作。
+六十甲子範圍保持配對驗證；`next_pillar()` 未實作。
 
 ## Layer 2 — Pairwise Interaction Engine v0.1
 
@@ -96,16 +96,27 @@ Ten Gods v0.2 的明確日主輸入契約保持不變；四柱組合由第三層
 - [x] 規則數量、唯一 ID、無序配對去重、成員／來源引用、每類成員覆蓋均驗證。
 - [x] `interactions.py` 負責載入、驗證與查詢；KnowledgeBase 只委派，共用既有嚴格 YAML reader。
 - [x] 100 種天干與 144 種地支有序輸入、JSON、trace、異常資料及舊 API 隔離均有測試。
-- [x] 17 條規則的 `requires_validation` 原樣保留；沒有合化、力量、解讀或四柱掃描。
+- [x] 17 條規則的 `requires_validation` 原樣保留；沒有合化、力量或解讀。四柱掃描由下述 Product Slice 組合此 API。
 
-## Roadmap：尚未開始的工作
+## Product Slice v0.1 — completed
 
-1. Four Pillars v0.2：重用 Pairwise API，掃描六組天干與六組地支配對，保留柱位置及規則來源。
-2. Interaction Engine v0.2：另定害／破／刑的成員數量、來源與前提。
-3. Multi-member Interaction Engine：另定三合／三會，不強塞到兩成員模型。
-4. 月令／旺衰／強弱 → 格局／喜用 → Interpretation：另訂流派、前提與驗證邊界。
+- [x] Four Pillars × Pairwise integration：天干／地支各掃描 6 組，重用原 API。
+- [x] `ChartInteraction` 保留 domain、左右柱位置及原 relation_result／trace。
+- [x] `FourPillarsAnalysis` 新增 stem_interactions／branch_interactions，原結構欄位保持。
+- [x] Streamlit MVP：已知四柱輸入、日主、四柱表、藏干十神、命盤關係、推理及來源狀態。
+- [x] 輸入錯誤中文提示；失敗提交清除舊結果，UI 不呈現 Python traceback。
+- [x] Streamlit optional dependency、安裝／啟動文件、helper 與 AppTest 測試。
+- [x] 全部既有引擎功能與來源狀態回歸驗證；沒有新增八字規則。
+
+## 後續選項：先實際使用，再決定
+
+- 使用者測試與介面可讀性回饋。
+- 出生日期 → 四柱排盤（需另訂曆法、時區及來源規格）。
+- 刑／害／破。
+- 三合／三會（多成員規則）。
+- 月令／旺衰（需另訂流派、條件及驗證邊界）。
 
 Knowledge Quality / Research Track 平行維護十神及各關係規則的歷史文獻核對與差異紀錄；
 考據不是目前唯一功能優先項目，也不因新功能完成而解除待驗證狀態。
 
-以上均為未實作方向，需另訂來源、前提與驗收規格。本次完成 Pairwise v0.1 後停止。
+以上未指定唯一下一步。本次完成 MVP 後停止，不自動開始下一階段。

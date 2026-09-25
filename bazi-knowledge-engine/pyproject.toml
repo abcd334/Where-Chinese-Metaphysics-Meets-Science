@@ -12,6 +12,7 @@ dependencies = ["PyYAML>=6.0.2,<7", "pydantic>=2.10,<3"]
 
 [project.optional-dependencies]
 dev = ["pytest>=8,<10"]
+app = ["streamlit>=1.41,<2"]
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/bazi_knowledge"]
@@ -20,7 +21,7 @@ packages = ["src/bazi_knowledge"]
 knowledge = "bazi_knowledge/knowledge"
 
 [tool.hatch.build.targets.sdist]
-include = ["/README.md", "/TODO.md", "/pyproject.toml", "/docs", "/knowledge", "/src", "/tests", "/examples"]
+include = ["/README.md", "/TODO.md", "/pyproject.toml", "/streamlit_app.py", "/docs", "/knowledge", "/src", "/tests", "/examples"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

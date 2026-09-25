@@ -1,11 +1,12 @@
-# Four Pillars Structure v0.1
+# Four Pillars Structure + Pairwise Integration
 
 [回文件導覽](../README.md) · [架構](architecture.md) · [開發參考](development.md) · [來源](sources.md)
 
 **Layer 3 — 命盤結構 · Status: implemented**
 
 **Structural analysis only.** 本版列出已知四柱的日主、明干十神與藏干十神，
-讓每個結論可以追溯到第二層規則及第一層基本資料。不進行個人命理解讀。
+讓每個結論可以追溯到第二層規則及第一層基本資料。Product Slice v0.1 已加上附柱位置的兩兩關係掃描，
+不進行個人命理解讀。
 
 ## 輸入與驗證
 
@@ -44,7 +45,8 @@ caller 提供已知四柱；生日換算、節氣、時區及排盤都不在 v0.
 | `FourPillars` | `year`、`month`、`day`、`hour` 四個必要 `Pillar` |
 | `VisibleStemAnalysis` | `stem`、`role`、`ten_god_result: TenGodResult \| None` |
 | `PillarAnalysis` | `position`、`pillar`、`visible_stem_analysis`、`branch_analysis: BranchTenGodResult` |
-| `FourPillarsAnalysis` | `chart`、`day_master`、有序 `pillars`、`trace`、去重 `sources` |
+| `ChartInteraction` | `domain`、`left_position`、`right_position`、原 `relation_result` |
+| `FourPillarsAnalysis` | `chart`、`day_master`、有序 `pillars`、`trace`、去重 `sources`、`stem_interactions`、`branch_interactions` |
 
 `pillars` 是固定四筆 tuple，順序為 year、month、day、hour；例如 `result.pillars[2]` 是日柱分析。
 各柱可經 `result.chart.day` 等名稱取得。結果模型檢查日主、位置順序與子結果所屬柱一致。
@@ -75,6 +77,32 @@ Layer 3 不重新查一張藏干表，也不重新實作十神邏輯；原 `Bran
 | month | 辛卯 | 辛 → 正印 | 乙 → 傷官 |
 | day | 壬戌 | 壬 → 日主 | 戊 → 七殺；辛 → 正印；丁 → 正財 |
 | hour | 乙巳 | 乙 → 傷官 | 丙 → 偏財；戊 → 七殺；庚 → 偏印 |
+
+偵測關係：年干丙 ↔ 月干辛 → 五合；月支卯 ↔ 日支戌 → 六合。
+
+## 附位置的兩兩關係
+
+依序掃描 year-month、year-day、year-hour、month-day、month-hour、day-hour。
+每組各呼叫一次原 `get_stem_relations()` 與 `get_branch_relations()`，總共 6＋6 次，包含日干作為配對成員。
+不重新實作匹配，不呼叫相反方向再記一次；重複字元出現在不同柱仍保留各自的位置組合。
+
+`stem_interactions`／`branch_interactions` 為 tuple，只列命中項目。
+`ChartInteraction.relation_result` 是原 Pairwise 結果物件；`left_member`／`right_member`
+是讀取該結果 members 的 property，不另存一份成員或規則。
+模型驗證 domain、柱位置順序及成員是否與 chart 一致，拒絕同位置配對或重複規則結果。
+這兩個新欄位預設為空 tuple，舊序列化結果仍可讀取；新分析必定執行全部掃描。
+
+```python
+stem, = result.stem_interactions
+assert (stem.left_position, stem.right_position) == ("year", "month")
+assert stem.relation_result.rule.id == "stem_combine_bing_xin"
+branch, = result.branch_interactions
+assert (branch.left_position, branch.right_position) == ("month", "day")
+assert branch.relation_result.rule.relation == "six_harmony"
+```
+
+未命中只表示目前 rule set 未偵測到；不表示這組干支在其他尚未實作規則下沒有關係。
+整合後四柱分析需要兩份 Pairwise YAML，缺檔或驗證失敗會明確報錯，不回傳部分成功結果。
 
 ```python
 assert result.day_master is result.chart.day.stem
@@ -124,12 +152,14 @@ pillars:day → heavenly_stems:ren → day_master:ren
 
 Layer 2 子結果與 trace 保留原物件，不壓成中文一句話。
 `sources` 合併所有子結果引用的完整既有來源，藏干與十神各自的 source status 原樣保留。
+現在也合併命中 Pairwise 規則的來源。`ChartInteraction` 只提供柱位置上下文，
+其 `relation_result.trace` 保留原 lookup 與 rule ID；原六步 chart trace 與十神 trace 不改寫。
 十神 `requires_validation` 不因四柱串接成功而解除。
 
 ## v0.1 的邊界
 
 四柱分析目前沒有權重、百分比、主中餘氣、月令、旺衰、格局或個人命理解讀。
-Layer 2 已有五合、六合與六沖的兩成員查詢；本 API 尚未自動掃描或加入其結果。
+本 API 已掃描五合、六合與六沖；沒有增加其他互動規則，也不解讀合化或吉凶。
 Hidden stem weighting and qi classification require separate source validation.
 現有季節 API 繼續存在，但不參與四柱 v0.1 的計算。
-本次停在已知四柱的結構分析；Four Pillars v0.2 尚未實作。
+本次以 [Streamlit MVP](demo.md) 提供可操作介面，後續功能待實際使用後再決定。

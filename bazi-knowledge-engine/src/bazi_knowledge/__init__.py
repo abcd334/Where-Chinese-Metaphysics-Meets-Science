@@ -20,12 +20,14 @@ from .loader import (
 )
 
 from .interactions import StemRelation, BranchRelation, InteractionData, StemRelationResult, BranchRelationResult
+from .errors import PillarInputError
 from .models import (
     EarthlyBranch, Element, ElementRelation, HeavenlyStem, HiddenStemSet, KnowledgeData, YinYang,
     Concept, ConceptData, Source, SourceStatus, TraditionalAssociation, HiddenStemSeasonContext,
     TenGod, TenGodData, TenGodResult, ReasoningStep,
     BranchTenGodResult, HiddenStemTenGodResult,
     Pillar, FourPillars, VisibleStemAnalysis, PillarAnalysis, FourPillarsAnalysis,
+    ChartInteraction,
 )
 
 __all__ = [
@@ -43,4 +45,5 @@ __all__ = [
     "generate_sexagenary_cycle", "is_valid_pillar", "get_sexagenary_index",
     "get_stem_relations", "get_branch_relations", "StemRelation", "BranchRelation",
     "InteractionData", "StemRelationResult", "BranchRelationResult",
+    "ChartInteraction", "PillarInputError",
 ]

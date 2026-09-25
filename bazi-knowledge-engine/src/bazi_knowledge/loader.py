@@ -7,6 +7,8 @@ from typing import get_args
 
 from ._yaml import _UniqueKeyLoader, _knowledge_root, _read_yaml
 from .interactions import InteractionEngine, StemRelationResult, BranchRelationResult
+from .four_pillars import scan_chart_interactions
+from .errors import PillarInputError
 
 from .models import (
     Concept, ConceptData, EarthlyBranch, FactReference, HeavenlyStem,
@@ -343,16 +345,16 @@ class KnowledgeBase:
             if not isinstance(value, str):
                 raise TypeError(f"{position}: pillar must be a Chinese stem/branch string")
             if len(value) != 2:
-                raise ValueError(f"{position}: pillar must contain exactly two characters")
+                raise PillarInputError(position, value, "format", "pillar must contain exactly two characters")
             try:
                 parsed[position] = Pillar(stem=self.get_heavenly_stem(value[0]),
                                           branch=self.get_earthly_branch(value[1]))
             except KeyError as error:
-                raise ValueError(f"{position}: expected a known heavenly stem followed by an earthly branch") from error
+                raise PillarInputError(position, value, "unknown_member", "expected a known heavenly stem followed by an earthly branch") from error
             try:
                 cycle_indices[position] = self.get_sexagenary_index(value)
             except ValueError as error:
-                raise ValueError(f"{position}: invalid sexagenary pillar {value!r}") from error
+                raise PillarInputError(position, value, "invalid_pair", f"invalid sexagenary pillar {value!r}") from error
         # Validate all four inputs before running any Layer 2 analysis.
         chart = FourPillars(**parsed)
         master = chart.day.stem
@@ -386,8 +388,12 @@ class KnowledgeBase:
             for result in (visible_result, branch_result):
                 if result is not None:
                     sources.update((source.id, source) for source in result.sources)
+        stem_interactions, branch_interactions = scan_chart_interactions(self, chart)
+        for interaction in (*stem_interactions, *branch_interactions):
+            sources.update((source.id, source) for source in interaction.relation_result.sources)
         return FourPillarsAnalysis(chart=chart, day_master=master, pillars=tuple(analyses),
-                                   trace=tuple(trace), sources=tuple(sources.values()))
+                                   trace=tuple(trace), sources=tuple(sources.values()),
+                                   stem_interactions=stem_interactions, branch_interactions=branch_interactions)
 
     def _element_id(self, name_zh: str) -> str:
         for record in self.data.elements:

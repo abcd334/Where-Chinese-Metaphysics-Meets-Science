@@ -3,6 +3,7 @@
 import argparse
 
 from bazi_knowledge import KnowledgeBase
+from bazi_knowledge.presentation import interaction_label
 
 
 def main():
@@ -22,6 +23,9 @@ def main():
         print(f"{item.pillar.branch.char}:")
         for hidden in item.branch_analysis.hidden_stem_results:
             print(f"  {hidden.hidden_stem.char} → {hidden.ten_god_result.ten_god.name_zh}")
+    print("\nDetected Relationships:")
+    for interaction in (*result.stem_interactions, *result.branch_interactions):
+        print(interaction_label(interaction).replace("↔", "<->"))
 
 
 if __name__ == "__main__":

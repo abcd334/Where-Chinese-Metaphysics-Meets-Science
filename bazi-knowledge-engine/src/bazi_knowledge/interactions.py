@@ -2,38 +2,15 @@
 
 from collections import Counter
 from pathlib import Path
-from typing import Literal, Self
+from typing import Self
 
 from pydantic import Field, model_validator
 
 from ._yaml import _knowledge_root, _read_yaml
 from .models import (
-    DataModel, Identifier, Source, SourceStatus, TraceStep,
-    HeavenlyStem, EarthlyBranch, KnowledgeData,
+    DataModel, Source, TraceStep, KnowledgeData,
+    PairwiseRule, StemRelation, BranchRelation, StemRelationResult, BranchRelationResult,
 )
-
-
-class PairwiseRule(DataModel):
-    id: Identifier
-    members: tuple[Identifier, Identifier]
-    source_ids: tuple[Identifier, ...] = Field(min_length=1)
-    source_status: SourceStatus
-
-    @model_validator(mode="after")
-    def validate_pair(self) -> Self:
-        if self.members[0] == self.members[1]:
-            raise ValueError("pairwise rule needs two distinct members")
-        if len(set(self.source_ids)) != len(self.source_ids):
-            raise ValueError("duplicate source reference")
-        return self
-
-
-class StemRelation(PairwiseRule):
-    relation: Literal["combine"]
-
-
-class BranchRelation(PairwiseRule):
-    relation: Literal["six_harmony", "clash"]
 
 
 class InteractionData(DataModel):
@@ -69,20 +46,6 @@ class InteractionData(DataModel):
                 if members != Counter({member: 1 for member in known}):
                     raise ValueError("interactions: each member needs exactly one partner per relation")
         return self
-
-
-class StemRelationResult(DataModel):
-    rule: StemRelation
-    members: tuple[HeavenlyStem, HeavenlyStem]
-    trace: tuple[TraceStep, ...] = Field(min_length=1, max_length=1)
-    sources: tuple[Source, ...] = Field(min_length=1)
-
-
-class BranchRelationResult(DataModel):
-    rule: BranchRelation
-    members: tuple[EarthlyBranch, EarthlyBranch]
-    trace: tuple[TraceStep, ...] = Field(min_length=1, max_length=1)
-    sources: tuple[Source, ...] = Field(min_length=1)
 
 
 class InteractionEngine:

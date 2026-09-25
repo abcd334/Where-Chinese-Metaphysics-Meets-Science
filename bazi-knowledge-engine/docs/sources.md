@@ -136,3 +136,11 @@ v0.2 組合既有藏干引用與 v0.1 規則，沒有新增傳統對應、規則
 
 Knowledge Quality / Research Track 平行維護十神與關係資料的文獻核對；
 功能開發可依採用的 canonical 規格前進，同時明確保留來源限制。
+
+## Product Slice v0.1 的呈現界線
+
+本次只將原有規則組合為附柱位置的四柱結果並呈現在 Streamlit，沒有新增知識 YAML 或來源聲稱。
+圖表、關係名稱與推理區塊均來自結構化結果；十神、Pairwise 規則的 requires_validation 原樣保留。
+藏干 source_attested 僅表示符合指定 canonical dataset，沒有驗證權重或氣分類。
+即使命盤沒有命中 Pairwise，Knowledge Status 仍呈現目前載入規則的驗證狀態。
+個別來源的 title／locator／scope／checked_on 可在畫面下方展開，並保留原文獻連結。

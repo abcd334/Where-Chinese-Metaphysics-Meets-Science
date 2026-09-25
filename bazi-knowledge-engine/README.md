@@ -1,4 +1,24 @@
-# 八字 Knowledge Engine
+# Explainable Bazi Knowledge Engine
+
+**Product Slice v0.1 · 可操作的 Streamlit MVP 已完成。**
+輸入已知四柱，查看日主、明干十神、藏干十神、天干五合與地支六合／六沖，並展開推理及來源。
+
+## Run the Demo
+
+需要 Python 3.12+，在此目錄執行：
+
+```powershell
+python -m pip install -e ".[app]"
+python -m streamlit run streamlit_app.py
+```
+
+也可使用 `streamlit run streamlit_app.py`。預設範例 **丙寅 辛卯 壬戌 乙巳**，按「分析 · Analyze」開始。
+Streamlit 僅為 optional dependency，純引擎仍可使用 `pip install -e .`。
+操作、錯誤提示與測試方式見 [MVP 說明](docs/demo.md)。
+
+目前已包含 machine-readable traditional knowledge、deterministic Ten Gods reasoning、
+hidden stem expansion、four pillars structural analysis、sexagenary cycle validation、
+pairwise interaction detection 及 Streamlit demo。
 
 這是一個機器可讀、可驗證、可追溯的八字知識庫，目前還不是算命程式。
 **Layer 1 — Basic Elements**
@@ -20,8 +40,8 @@ v1.0 凍結目前的基本分類、引用方式與查詢契約；待考據的來
    生剋、藏干、季節關聯、Ten Gods v0.2、六十甲子、Pairwise v0.1
    Pairwise：天干五合、地支六合／六沖
         ↓ 組合既有規則
-3. 命盤結構 — Four Pillars Structure v0.1 implemented
-   已知四柱：日主、明干十神、藏干十神（Structural analysis only）
+3. 命盤結構 — Four Pillars Structure + Pairwise Integration implemented
+   已知四柱：日主、明干／藏干十神、附位置的兩兩關係（Structural analysis only）
         ↓ 未來解讀
 4. 命理解讀
    旺衰、格局、喜用、大運流年等（尚未實作）
@@ -34,7 +54,7 @@ v1.0 凍結目前的基本分類、引用方式與查詢契約；待考據的來
 第二層已有五行生剋、十二地支藏干、藏干與季節的關聯查詢，以及 **Ten Gods Engine v0.2**。
 十神以兩個天干的五行方向與陰陽同異匹配十條 YAML 規則，包含結構化推理紀錄。
 v0.2 串接既有藏干查詢與 v0.1，依原藏干順序回傳每個天干的十神及完整 trace。
-**Layer 3 — Four Pillars Structure v0.1 · Status: implemented**。
+**Layer 3 — Four Pillars Structure + Pairwise Integration · Status: implemented**。
 接受 caller 已知的年、月、日、時四柱，從日柱天干取得日主，組合第二層十神及藏干查詢。
 Structural analysis only. 不換算出生日期，不判斷力量或作個人命理解讀。
 **Sexagenary Cycle v0.1 · Status: implemented**：依既有天干與地支順序循環產生 60 個配對，
@@ -42,13 +62,14 @@ Structural analysis only. 不換算出生日期，不判斷力量或作個人命
 目前尚未實作通用 Rule Engine。
 **Pairwise Interaction Engine v0.1 · Status: implemented**：以 5 條天干五合、6 條地支六合及
 6 條地支六沖 YAML 規則提供無方向的兩兩查詢，只記錄關係存在。
-不計算合化、不判斷吉凶，也尚未讓 Four Pillars 自動掃描。
+不計算合化、不判斷吉凶；Four Pillars 現會掃描 6 組明干與 6 組地支配對並保留位置。
 四層是責任分工，不代表四層都已完成，也不要求依層號刪除已存在的功能。
 
 ## 文件導覽
 
 | 想了解的事情 | 文件 |
 | --- | --- |
+| 如何操作 Streamlit、查看推理及驗證狀態？ | [MVP 操作說明](docs/demo.md) |
 | 陰陽、五行、每個天干和地支是什麼？ | [基礎元素入門](docs/basic-elements.md) |
 | 四層如何分工？哪些已完成？ | [架構與目前範圍](docs/architecture.md) |
 | 生剋、藏干、四季與十神如何查詢？ | [關係資料](docs/relationships.md) |
@@ -130,7 +151,7 @@ v0.2 的 `get_branch_ten_gods()` 接受 **Day Master Heavenly Stem × Target Ear
 日主由 caller 明確提供；藏干順序不是權重，也不產生地支的單一十神結論。
 完整示例見 [天干十神](examples/ten_gods.py) 與 [地支藏干十神](examples/branch_ten_gods.py)。
 十條規則採用使用者指定的 canonical implementation specification，歷史文獻依據仍標記
-`requires_validation`。尚未加入排盤、日期換算、刑害破、三合三會、個人命理解讀、資料庫、Web UI 或 LLM。
+`requires_validation`。目前已有 Streamlit UI；尚未加入排盤、日期換算、刑害破、三合三會、個人命理解讀、資料庫或 LLM。
 
 ```python
 match, = kb.get_stem_relations("丙", "辛")

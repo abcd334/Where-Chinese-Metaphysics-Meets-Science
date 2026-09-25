@@ -13,8 +13,10 @@ Where Chinese Metaphysics Meets Science/
     ├── README.md                     # 專案導覽與快速開始
     ├── TODO.md                       # 待辦與待驗證事項
     ├── pyproject.toml
+    ├── streamlit_app.py              # optional Streamlit 產品入口
     ├── docs/
     │   ├── architecture.md
+    │   ├── demo.md
     │   ├── basic-elements.md
     │   ├── four-pillars.md
     │   ├── sexagenary-cycle.md
@@ -50,6 +52,9 @@ Where Chinese Metaphysics Meets Science/
     │   ├── loader.py
     │   ├── _yaml.py
     │   ├── interactions.py
+    │   ├── four_pillars.py
+    │   ├── presentation.py
+    │   ├── errors.py
     │   └── models.py
     └── tests/
         ├── test_five_elements.py
@@ -63,6 +68,8 @@ Where Chinese Metaphysics Meets Science/
         ├── test_four_pillars.py
         ├── test_sexagenary_cycle.py
         ├── test_interactions.py
+        ├── test_presentation.py
+        ├── test_streamlit_app.py
         ├── test_seasonal_context.py
         └── test_loader.py
 ```
@@ -437,7 +444,8 @@ API 先透過原 `get_heavenly_stem()`、`get_earthly_branch()` 驗證全部四�
 
 ## Pairwise Interaction Engine v0.1
 
-`interactions.py` 是具體的兩成員關係領域，包含模型、規則載入、驗證與查詢。
+`interactions.py` 是具體的兩成員關係領域，包含規則載入、資料驗證與查詢。
+共用規則／結果型別位於 `models.py`，從 `interactions.py` 與 package root 的既有匯入仍保持相容。
 沿用 `DataModel`、`Identifier`、`Source`、`SourceStatus`、`TraceStep` 及基本干支物件。
 共用 YAML reader 僅從 `loader.py` 原樣抽出；舊載入函式與查詢契約不變。
 沒有新 dependency、第二套五行表、通用條件引擎或四柱掃描。
@@ -481,7 +489,7 @@ assert StemRelationResult.model_validate_json(result.model_dump_json()) == resul
 `KnowledgeBase.interactions` 是延遲載入的 `InteractionEngine`，其 `.data` 提供已驗證的完整規則。
 首次 pairwise 查詢會讀取兩份規則檔與 `concepts/sources.yaml`，不讀其他 Concept／季節／十神檔案。
 缺檔或壞資料直接報錯，不回退預設資料。相對自訂目錄沿用 KnowledgeBase 的絕對路徑定位。
-未使用 pairwise API 時不需要這兩份新規則檔；Four Pillars v0.1 也不觸發它們。
+基本查詢不需要這兩份新規則檔；整合後 `analyze_four_pillars()` 會掃描 Pairwise，因此必須提供完整規則檔。
 兩個 API 均有 module-level wrapper；參數非字串為 TypeError，未知或跨集合字串為 KeyError。
 
 結果 frozen、tuple 且可 JSON 往返；`trace` 為一個 lookup，基本成員引用指向規則引用，
@@ -495,4 +503,30 @@ assert StemRelationResult.model_validate_json(result.model_dump_json()) == resul
 
 `test_interactions.py` 窮舉 100 個天干、144 個地支有序輸入，包含 17 條規則的正反方向、
 無關及同成員查詢。另驗證來源與物件引用、JSON、壞 YAML／規則拒絕、自訂資料改動生效、
-延遲載入，以及原四柱功能不自動查詢 pairwise 關係。
+延遲載入，以及基礎查詢的隔離；四柱整合測試另驗證 6＋6 組查詢及位置 context。
+
+## Product Slice v0.1
+
+`four_pillars.py` 僅枚舉固定柱序的兩兩組合並呼叫既有 API。
+`ChartInteraction` 記錄 domain、left_position、right_position 及原 relation_result；
+成員透過 left_member／right_member property 讀取，不重存規則或成員屬性。
+`FourPillarsAnalysis.stem_interactions` 與 `branch_interactions` 為有序 tuple，無命中則為空。
+結果來源包括命中的 Pairwise 來源；既有 chart／pillar／十神 trace 保持不變。
+
+原基本輸入錯誤現在使用 `PillarInputError(ValueError)`，提供 position、value、code，
+原先捕捉 ValueError 的 caller 仍相容。UI 只翻譯錯誤類型，不重新驗證干支。
+缺少新規則檔時，四柱分析會報錯而不回傳不完整結果；原單一基本與十神查詢不增加這項依賴。
+
+Streamlit 只從 `streamlit_app.py` 匯入；`bazi_knowledge` 核心不依賴 Streamlit。
+`presentation.py` 只把結果轉成欄位、顯示標籤與來源狀態，沒有推理規則。
+安裝 `.[app,dev]` 可執行所有測試；只裝 `.[dev]` 時 Streamlit AppTest 會明確 skipped，其他測試照常運行。
+
+```powershell
+python -m pip install -e ".[app,dev]"
+python -m pytest -q
+python -m streamlit run streamlit_app.py
+```
+
+AppTest 使用 [Streamlit 官方測試框架](https://docs.streamlit.io/develop/api-reference/app-testing/st.testing.v1.apptest)，
+不需要瀏覽器 automation。涵蓋匯入、預設提交、錯誤處理、清除過期結果、無命中說明與資料載入失敗。
+Streamlit 服務的啟動／health 檢查與 AppTest 搭配驗收；操作文件見 [demo.md](demo.md)。

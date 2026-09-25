@@ -201,7 +201,7 @@ def test_members_and_provenance_are_data_driven(knowledge_dir):
     assert [source.id for source in result.sources] == ["concept_spec"]
 
 
-def test_old_apis_and_four_pillars_do_not_load_interaction_files(knowledge_dir):
+def test_basic_apis_stay_independent_but_integrated_chart_requires_rules(knowledge_dir):
     for name in ("stem_relations.yaml", "branch_relations.yaml"):
         (knowledge_dir / name).unlink()
     kb = KnowledgeBase(knowledge_dir)
@@ -210,9 +210,9 @@ def test_old_apis_and_four_pillars_do_not_load_interaction_files(knowledge_dir):
     assert kb.get_ten_god("壬", "乙").ten_god.name_zh == "傷官"
     assert kb.get_branch_ten_gods("壬", "戌").branch.char == "戌"
     assert kb.is_valid_pillar("甲子") is True
-    result = kb.analyze_four_pillars(year="丙寅", month="辛卯", day="壬戌", hour="乙巳")
-    assert result.day_master.char == "壬"
     assert "interactions" not in kb.__dict__
+    with pytest.raises(FileNotFoundError):
+        kb.analyze_four_pillars(year="丙寅", month="辛卯", day="壬戌", hour="乙巳")
     with pytest.raises(FileNotFoundError):
         kb.get_stem_relations("甲", "己")
 

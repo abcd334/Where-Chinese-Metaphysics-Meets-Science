@@ -69,7 +69,8 @@ v0.2 是第二層既有能力的組合，不新增規則 YAML 或另一套十神
 五行生剋可以在入門時一併介紹，但在架構上屬第二層。
 藏干也歸第二層，引用第一層天干；不複製天干的五行或陰陽。
 
-Pairwise v0.1 由 `interactions.py` 獨立承擔規則模型、引用驗證與無方向匹配。
+Pairwise v0.1 由 `interactions.py` 承擔規則資料驗證與無方向匹配。
+其共用規則／結果型別集中於 `models.py`，供第二層與四柱層共用，原匯入路徑仍可使用。
 `KnowledgeBase.interactions` 首次查詢才載入兩份規則 YAML 及共用來源 registry；
 既有 `_UniqueKeyLoader`、知識目錄定位與讀取函式移至 `_yaml.py` 共用，讀取行為不變。
 `get_stem_relations()`／`get_branch_relations()` 是薄的委派入口，不建立通用 Rule Engine。
@@ -77,7 +78,7 @@ Pairwise v0.1 由 `interactions.py` 獨立承擔規則模型、引用驗證與�
 
 ## 三、命盤結構
 
-**Layer 3 — Four Pillars Structure v0.1 · Status: implemented**
+**Layer 3 — Four Pillars Structure + Pairwise Integration · Status: implemented**
 
 回答「caller 提供的四柱中有哪些可列出的結構？」Structural analysis only.
 四柱以必要的 year／month／day／hour 參數輸入，每柱是兩個中文字：一個天干接一個地支。
@@ -93,11 +94,13 @@ Pairwise v0.1 由 `interactions.py` 獨立承擔規則模型、引用驗證與�
 
 日干標示 `role: day_master`，其 visible `ten_god_result` 為 null；
 相同天干出現在其他柱時，仍按目標天干處理。
-此層只組合 Layer 2 API，不新增生剋、藏干或十神 mapping；月支沒有額外優先或力量判斷。
+此層只組合 Layer 2 API，不新增生剋、藏干、十神或配對 mapping；月支沒有額外優先或力量判斷。
+`four_pillars.py` 依固定柱序枚舉 C(4,2)，分別呼叫 6 次天干及 6 次地支查詢。
+命中結果以 `ChartInteraction` 加上左右柱位置，原 Pairwise result／trace 直接保留；沒有命中的配對不列出。
 外層 trace 保存四柱位置與日主選取，嵌套結果保留既有規則 trace 和來源狀態。
 
 單柱六十甲子配對已驗證；年／月及日／時之間的曆法配柱、日期可實現性仍不驗證。
-不排盤、不做日期轉四柱，沒有權重、旺衰或解讀；目前不自動掃描 Layer 2 pairwise 關係。
+不排盤、不做日期轉四柱，沒有權重、旺衰或解讀；目前只掃描已實作的五合／六合／六沖。
 完整輸入契約、模型與範例見 [四柱結構](four-pillars.md)。
 
 ## 四、命理解讀
@@ -121,6 +124,8 @@ Pairwise v0.1 由 `interactions.py` 獨立承擔規則模型、引用驗證與�
 | 第二層六十甲子生成與驗證 | `KnowledgeBase.generate_sexagenary_cycle()`；從基本資料 order 推導，不新增 YAML 表 |
 | 第二層 Pairwise 關係 | `knowledge/stem_relations.yaml`、`branch_relations.yaml`；`interactions.py` 載入及查詢 |
 | 第三層四柱結構 | `models.py` 的四柱模型、`KnowledgeBase.analyze_four_pillars()`；不新增知識 YAML |
+| 第三層 Pairwise 組合 | `four_pillars.py`，重用第二層查詢，新增柱位置 context |
+| 產品呈現 | 根目錄 `streamlit_app.py` 及 `presentation.py`，只收輸入、呼叫引擎、整理與呈現結果 |
 | 共用載入、驗證與來源 | `_yaml.py`、既有 `loader.py`／`models.py`、`knowledge/concepts/sources.yaml` |
 
 檔案位置不等於架構層。一個檔案可以包含元素說明和相關關係說明。
@@ -129,3 +134,10 @@ Pairwise v0.1 由 `interactions.py` 獨立承擔規則模型、引用驗證與�
 
 第一層 v1.0 保持原樣；第二層已有十神 v0.1 及 v0.2，既有 API 與資料引用方式保持相容。
 舊來源 ID 中的 `phase1`、`phase2` 保留作為歷史來源識別，不再作為目前的架構命名。
+
+## Streamlit MVP
+
+Streamlit 是四層引擎外的產品入口，不是第五個知識層。`presentation.py` 只有欄位投影與中文顯示標籤，
+不判斷十神、藏干、生剋或合沖。UI 透過 `PillarInputError` 呈現驗證失敗，其餘資料錯誤顯示一般訊息。
+成功分析保存在當前瀏覽器 session，新的提交失敗時清除，避免把舊結果當成新結果。
+詳見 [Product Slice v0.1](demo.md)。

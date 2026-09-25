@@ -247,3 +247,78 @@ def test_new_models_reject_out_of_scope_fields(analysis, field):
 def test_analysis_is_immutable(analysis):
     with pytest.raises(ValidationError, match="frozen"):
         analysis.pillars = ()
+
+
+def test_canonical_chart_interactions_preserve_positions_and_trace(kb, analysis):
+    stem, = analysis.stem_interactions
+    branch, = analysis.branch_interactions
+    assert (stem.domain, stem.left_position, stem.right_position) == ("heavenly_stem", "year", "month")
+    assert (branch.domain, branch.left_position, branch.right_position) == ("earthly_branch", "month", "day")
+    assert (stem.left_member.char, stem.right_member.char, stem.relation_result.rule.relation) == ("丙", "辛", "combine")
+    assert (branch.left_member.char, branch.right_member.char, branch.relation_result.rule.relation) == ("卯", "戌", "six_harmony")
+    assert stem.relation_result == kb.get_stem_relations("丙", "辛")[0]
+    assert branch.relation_result == kb.get_branch_relations("卯", "戌")[0]
+    sources = {source.id: source for source in analysis.sources}
+    for item in (stem, branch):
+        assert item.relation_result.rule.source_status.value == "requires_validation"
+        assert all(sources[source.id] == source for source in item.relation_result.sources)
+
+
+def test_six_pairs_per_domain_are_called_once_and_results_reused(monkeypatch):
+    from itertools import combinations
+    kb = KnowledgeBase()
+    calls = {"stem": [], "branch": []}
+    originals = {"stem": kb.get_stem_relations, "branch": kb.get_branch_relations}
+
+    def tracked(domain):
+        def query(left, right):
+            results = originals[domain](left, right)
+            calls[domain].append((left, right, results))
+            return results
+        return query
+
+    monkeypatch.setattr(kb, "get_stem_relations", tracked("stem"))
+    monkeypatch.setattr(kb, "get_branch_relations", tracked("branch"))
+    result = kb.analyze_four_pillars(**CHART)
+    for domain, ids, interactions in (
+        ("stem", ("bing", "xin", "ren", "yi"), result.stem_interactions),
+        ("branch", ("yin", "mao", "xu", "si"), result.branch_interactions),
+    ):
+        assert [(a, b) for a, b, _ in calls[domain]] == list(combinations(ids, 2))
+        matched = [match for _, _, matches in calls[domain] for match in matches]
+        assert len(interactions) == len(matched)
+        assert all(item.relation_result is original for item, original in zip(interactions, matched, strict=True))
+
+
+def test_repeated_members_keep_distinct_position_pairs_without_reversed_duplicates(kb):
+    result = kb.analyze_four_pillars(year="丙寅", month="辛卯", day="丙寅", hour="辛卯")
+    assert [(item.left_position, item.right_position) for item in result.stem_interactions] == [
+        ("year", "month"), ("year", "hour"), ("month", "day"), ("day", "hour"),
+    ]
+    assert result.branch_interactions == ()
+    assert result.stem_interactions[2].relation_result.members[0].char == "辛"
+
+
+def test_clashes_and_no_matches(kb):
+    result = kb.analyze_four_pillars(year="甲子", month="甲午", day="甲子", hour="甲午")
+    assert result.stem_interactions == ()
+    assert len(result.branch_interactions) == 4
+    assert {item.relation_result.rule.relation for item in result.branch_interactions} == {"clash"}
+    empty = kb.analyze_four_pillars(**dict.fromkeys(POSITIONS, "甲子"))
+    assert empty.stem_interactions == empty.branch_interactions == ()
+
+
+@pytest.mark.parametrize("mutation", ["reverse", "domain", "position", "duplicate"])
+def test_bad_chart_interaction_context_rejected(analysis, mutation):
+    raw = analysis.model_dump()
+    item = raw["stem_interactions"][0]
+    if mutation == "reverse":
+        item["left_position"], item["right_position"] = item["right_position"], item["left_position"]
+    elif mutation == "domain":
+        item["domain"] = "earthly_branch"
+    elif mutation == "position":
+        item["right_position"] = "hour"
+    else:
+        raw["stem_interactions"] = (item, item)
+    with pytest.raises(ValidationError):
+        FourPillarsAnalysis.model_validate(raw)

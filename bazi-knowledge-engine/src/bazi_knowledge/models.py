@@ -353,7 +353,69 @@ class BranchTenGodResult(DataModel):
     sources: tuple[Source, ...] = Field(min_length=1)
 
 
+class PairwiseRule(DataModel):
+    id: Identifier
+    members: tuple[Identifier, Identifier]
+    source_ids: tuple[Identifier, ...] = Field(min_length=1)
+    source_status: SourceStatus
+
+    @model_validator(mode="after")
+    def validate_pair(self) -> Self:
+        if self.members[0] == self.members[1]:
+            raise ValueError("pairwise rule needs two distinct members")
+        if len(set(self.source_ids)) != len(self.source_ids):
+            raise ValueError("duplicate source reference")
+        return self
+
+
+class StemRelation(PairwiseRule):
+    relation: Literal["combine"]
+
+
+class BranchRelation(PairwiseRule):
+    relation: Literal["six_harmony", "clash"]
+
+
+class StemRelationResult(DataModel):
+    rule: StemRelation
+    members: tuple[HeavenlyStem, HeavenlyStem]
+    trace: tuple[TraceStep, ...] = Field(min_length=1, max_length=1)
+    sources: tuple[Source, ...] = Field(min_length=1)
+
+
+class BranchRelationResult(DataModel):
+    rule: BranchRelation
+    members: tuple[EarthlyBranch, EarthlyBranch]
+    trace: tuple[TraceStep, ...] = Field(min_length=1, max_length=1)
+    sources: tuple[Source, ...] = Field(min_length=1)
+
+
 PillarPosition = Literal["year", "month", "day", "hour"]
+
+
+class ChartInteraction(DataModel):
+    domain: Literal["heavenly_stem", "earthly_branch"]
+    left_position: PillarPosition
+    right_position: PillarPosition
+    relation_result: StemRelationResult | BranchRelationResult
+
+    @property
+    def left_member(self) -> HeavenlyStem | EarthlyBranch:
+        return self.relation_result.members[0]
+
+    @property
+    def right_member(self) -> HeavenlyStem | EarthlyBranch:
+        return self.relation_result.members[1]
+
+    @model_validator(mode="after")
+    def validate_context(self) -> Self:
+        positions = get_args(PillarPosition)
+        if positions.index(self.left_position) >= positions.index(self.right_position):
+            raise ValueError("interaction positions must be distinct and in chart order")
+        expected = StemRelationResult if self.domain == "heavenly_stem" else BranchRelationResult
+        if not isinstance(self.relation_result, expected):
+            raise ValueError("interaction result must match its domain")
+        return self
 
 
 class Pillar(DataModel):
@@ -398,6 +460,8 @@ class FourPillarsAnalysis(DataModel):
     pillars: tuple[PillarAnalysis, ...] = Field(min_length=4, max_length=4)
     trace: tuple[TraceStep, ...] = Field(min_length=6, max_length=6)
     sources: tuple[Source, ...] = Field(min_length=1)
+    stem_interactions: tuple[ChartInteraction, ...] = ()
+    branch_interactions: tuple[ChartInteraction, ...] = ()
 
     @model_validator(mode="after")
     def validate_structure(self) -> Self:
@@ -416,4 +480,18 @@ class FourPillarsAnalysis(DataModel):
             if (item.branch_analysis.branch != item.pillar.branch
                     or item.branch_analysis.day_master != self.day_master):
                 raise ValueError("branch result must match its pillar and chart day_master")
+        seen = set()
+        for interactions, domain, attribute in (
+            (self.stem_interactions, "heavenly_stem", "stem"),
+            (self.branch_interactions, "earthly_branch", "branch"),
+        ):
+            for interaction in interactions:
+                members = tuple(getattr(getattr(self.chart, position), attribute)
+                                for position in (interaction.left_position, interaction.right_position))
+                if interaction.domain != domain or interaction.relation_result.members != members:
+                    raise ValueError("interaction members must match their chart positions and domain")
+                key = (domain, interaction.left_position, interaction.right_position, interaction.relation_result.rule.id)
+                if key in seen:
+                    raise ValueError("duplicate chart interaction")
+                seen.add(key)
         return self

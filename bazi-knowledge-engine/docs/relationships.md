@@ -68,8 +68,8 @@ lookup:
 `sources` 保存實際所用來源的完整記錄，`rule.source_status` 原樣保留。
 這是固定配對查詢，所以一個結構化 lookup 已表達判斷依據，不虛構五行生剋推導。
 
-本版不查藏干間互動、不接受命盤、不帶柱位置，也不讓 Four Pillars 自動掃描。
-後續 Four Pillars v0.2 才會組合查詢並標記 year／month／day／hour。
+Pairwise API 本身不查藏干間互動、不接受命盤、不帶柱位置。
+Product Slice v0.1 的四柱層現在組合這些查詢，自動掃描並標記 year／month／day／hour，規則本身沒有改變。
 範例：[examples/interactions.py](../examples/interactions.py)；模型與載入契約見[開發參考](development.md#pairwise-interaction-engine-v01)。
 
 ## 五行相生與相剋
