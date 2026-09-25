@@ -15,6 +15,7 @@ from .loader import (
     get_ten_god, classify_element_relation, load_ten_gods,
     get_branch_ten_gods,
     analyze_four_pillars,
+    generate_sexagenary_cycle, is_valid_pillar, get_sexagenary_index,
 )
 from .models import (
     EarthlyBranch, Element, ElementRelation, HeavenlyStem, HiddenStemSet, KnowledgeData, YinYang,
@@ -36,4 +37,5 @@ __all__ = [
     "BranchTenGodResult", "HiddenStemTenGodResult", "get_branch_ten_gods",
     "Pillar", "FourPillars", "VisibleStemAnalysis", "PillarAnalysis", "FourPillarsAnalysis",
     "analyze_four_pillars",
+    "generate_sexagenary_cycle", "is_valid_pillar", "get_sexagenary_index",
 ]

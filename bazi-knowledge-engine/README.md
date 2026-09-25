@@ -17,7 +17,7 @@ v1.0 凍結目前的基本分類、引用方式與查詢契約；待考據的來
    陰陽、五行、天干、地支：基本屬性＋白話說明
         ↓ 被引用
 2. 關係／組合規則
-   生剋、藏干、季節關聯、Ten Gods v0.2；合沖刑害尚未實作
+   生剋、藏干、季節關聯、Ten Gods v0.2、六十甲子；合沖刑害尚未實作
         ↓ 組合既有規則
 3. 命盤結構 — Four Pillars Structure v0.1 implemented
    已知四柱：日主、明干十神、藏干十神（Structural analysis only）
@@ -36,6 +36,8 @@ v0.2 串接既有藏干查詢與 v0.1，依原藏干順序回傳每個天干的�
 **Layer 3 — Four Pillars Structure v0.1 · Status: implemented**。
 接受 caller 已知的年、月、日、時四柱，從日柱天干取得日主，組合第二層十神及藏干查詢。
 Structural analysis only. 不換算出生日期，不判斷力量或作個人命理解讀。
+**Sexagenary Cycle v0.1 · Status: implemented**：依既有天干與地支順序循環產生 60 個配對，
+並在四柱分析前驗證每柱的合法性。
 目前尚未實作通用 Rule Engine。
 四層是責任分工，不代表四層都已完成，也不要求依層號刪除已存在的功能。
 
@@ -47,6 +49,7 @@ Structural analysis only. 不換算出生日期，不判斷力量或作個人命
 | 四層如何分工？哪些已完成？ | [架構與目前範圍](docs/architecture.md) |
 | 生剋、藏干、四季與十神如何查詢？ | [關係資料](docs/relationships.md) |
 | 已知四柱如何取得日主、明干與藏干十神？ | [四柱結構 v0.1](docs/four-pillars.md) |
+| 如何產生六十甲子、驗證干支配對與查詢序號？ | [六十甲子 v0.1](docs/sexagenary-cycle.md) |
 | 如何安裝、查詢、修改 YAML 與執行測試？ | [開發參考](docs/development.md) |
 | 資料從哪裡來？哪些說法還不能確定？ | [來源與驗證邊界](docs/sources.md) |
 | 接下來先整理什麼？ | [待辦清單](TODO.md) |
@@ -101,7 +104,16 @@ assert analysis.pillars[0].visible_stem_analysis.ten_god_result.ten_god.name_zh 
 
 四柱順序固定為 year／month／day／hour；日干優先標示「日主」，各柱藏干保留原順序。
 完整結構與 trace 範例見 [examples/four_pillars.py](examples/four_pillars.py)。
-本版只驗證每柱是已知天干＋地支，不檢查曆法上的配柱或整張四柱是否對應實際日期。
+現在除了驗證每柱是已知天干＋地支，也要求它屬於生成的六十甲子；例如甲丑會被拒絕。
+各柱合法仍不表示年／月、日／時配柱符合曆法，也不證明四柱對應某個實際日期。
+
+```python
+assert len(kb.generate_sexagenary_cycle()) == 60  # 有序 tuple[Pillar, ...]
+assert kb.is_valid_pillar("甲子") is True
+assert kb.is_valid_pillar("甲丑") is False
+assert kb.get_sexagenary_index("甲子") == 1
+assert kb.get_sexagenary_index("癸亥") == 60
+```
 
 個別地支說明只引用基本屬性，不帶入藏干、季節、組合或個人解讀。
 `get_concept("yin")` 仍指陰，`get_concept("wu")` 仍指戊；

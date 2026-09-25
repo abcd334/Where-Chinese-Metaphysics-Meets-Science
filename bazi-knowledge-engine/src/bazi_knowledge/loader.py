@@ -1,6 +1,7 @@
 """Read YAML, validate references, and query explicitly stored data."""
 
 from importlib.resources import files
+from math import lcm
 from functools import cached_property
 from pathlib import Path
 from typing import get_args
@@ -326,11 +327,36 @@ class KnowledgeBase:
             sources=tuple(source for source in self.concepts.sources if source.id in source_ids),
         )
 
+    def generate_sexagenary_cycle(self) -> tuple[Pillar, ...]:
+        """Pair ordered stems and branches until both cycles return to their start."""
+        stems = sorted(self.data.heavenly_stems, key=lambda stem: stem.order)
+        branches = sorted(self.data.earthly_branches, key=lambda branch: branch.order)
+        return tuple(Pillar(stem=stems[index % len(stems)], branch=branches[index % len(branches)])
+                     for index in range(lcm(len(stems), len(branches))))
+
+    def get_sexagenary_index(self, pillar: str) -> int:
+        """Return the one-based cycle index; reject strings outside the generated cycle."""
+        if not isinstance(pillar, str):
+            raise TypeError("pillar must be a Chinese stem/branch string")
+        for index, entry in enumerate(self.generate_sexagenary_cycle(), start=1):
+            if pillar == entry.stem.char + entry.branch.char:
+                return index
+        raise ValueError(f"Invalid sexagenary pillar: {pillar!r}")
+
+    def is_valid_pillar(self, pillar: str) -> bool:
+        """Check membership in the generated cycle; non-string inputs raise TypeError."""
+        try:
+            self.get_sexagenary_index(pillar)
+        except ValueError:
+            return False
+        return True
+
     def analyze_four_pillars(
         self, *, year: str, month: str, day: str, hour: str,
     ) -> FourPillarsAnalysis:
-        """Compose existing rules for four caller-supplied pillars; no calendar validation."""
+        """Validate cycle membership and compose existing rules; no date conversion."""
         parsed = {}
+        cycle_indices = {}
         for position, value in zip(get_args(PillarPosition), (year, month, day, hour), strict=True):
             if not isinstance(value, str):
                 raise TypeError(f"{position}: pillar must be a Chinese stem/branch string")
@@ -341,6 +367,10 @@ class KnowledgeBase:
                                           branch=self.get_earthly_branch(value[1]))
             except KeyError as error:
                 raise ValueError(f"{position}: expected a known heavenly stem followed by an earthly branch") from error
+            try:
+                cycle_indices[position] = self.get_sexagenary_index(value)
+            except ValueError as error:
+                raise ValueError(f"{position}: invalid sexagenary pillar {value!r}") from error
         # Validate all four inputs before running any Layer 2 analysis.
         chart = FourPillars(**parsed)
         master = chart.day.stem
@@ -350,7 +380,8 @@ class KnowledgeBase:
         )]
         trace.extend(TraceStep(
             operation="lookup", input_refs=(f"pillars:{position}",),
-            output_refs=(f"heavenly_stems:{pillar.stem.id}", f"earthly_branches:{pillar.branch.id}"),
+            output_refs=(f"heavenly_stems:{pillar.stem.id}", f"earthly_branches:{pillar.branch.id}",
+                         f"sexagenary_cycle:{cycle_indices[position]}"),
             source_ids=(),
         ) for position, pillar in parsed.items())
         trace.append(TraceStep(
@@ -420,6 +451,18 @@ def get_branch_ten_gods(day_master: str, branch: str) -> BranchTenGodResult:
 
 def analyze_four_pillars(*, year: str, month: str, day: str, hour: str) -> FourPillarsAnalysis:
     return KnowledgeBase().analyze_four_pillars(year=year, month=month, day=day, hour=hour)
+
+
+def generate_sexagenary_cycle() -> tuple[Pillar, ...]:
+    return KnowledgeBase().generate_sexagenary_cycle()
+
+
+def is_valid_pillar(pillar: str) -> bool:
+    return KnowledgeBase().is_valid_pillar(pillar)
+
+
+def get_sexagenary_index(pillar: str) -> int:
+    return KnowledgeBase().get_sexagenary_index(pillar)
 
 
 def classify_element_relation(day_master_element: str, target_element: str) -> TenGodElementRelation:

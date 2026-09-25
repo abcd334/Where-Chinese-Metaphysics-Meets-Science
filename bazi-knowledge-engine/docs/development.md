@@ -17,6 +17,7 @@ Where Chinese Metaphysics Meets Science/
     │   ├── architecture.md
     │   ├── basic-elements.md
     │   ├── four-pillars.md
+    │   ├── sexagenary-cycle.md
     │   ├── relationships.md
     │   ├── development.md
     │   └── sources.md
@@ -24,7 +25,8 @@ Where Chinese Metaphysics Meets Science/
     │   ├── inspect_knowledge.py
     │   ├── ten_gods.py
     │   ├── branch_ten_gods.py
-    │   └── four_pillars.py
+    │   ├── four_pillars.py
+    │   └── sexagenary_cycle.py
     ├── knowledge/
     │   ├── 陰陽/yin_yang.yaml
     │   ├── 五行/five_elements.yaml
@@ -54,6 +56,7 @@ Where Chinese Metaphysics Meets Science/
         ├── test_ten_gods.py
         ├── test_branch_ten_gods.py
         ├── test_four_pillars.py
+        ├── test_sexagenary_cycle.py
         ├── test_seasonal_context.py
         └── test_loader.py
 ```
@@ -93,6 +96,9 @@ Wheel 包含 knowledge YAML，安裝後不依賴來源 checkout 的工作目錄�
 | `get_ten_god` | 日主天干、目標天干：各接受中文字或天干 ID | `TenGodResult` |
 | `get_branch_ten_gods` | 日主天干、地支：各接受中文字或所屬集合 ID | `BranchTenGodResult` |
 | `analyze_four_pillars` | 必要關鍵字 year／month／day／hour，各為中文干支字串 | `FourPillarsAnalysis` |
+| `generate_sexagenary_cycle` | 無參數 | 有序 `tuple[Pillar, ...]`，60 筆 |
+| `is_valid_pillar` | 中文干支字串 | `bool`；非字串拋出 `TypeError` |
+| `get_sexagenary_index` | 合法中文干支字串 | 1–60 的整數；非法字串拋出 `ValueError` |
 | `classify_element_relation` | 日主五行、目標五行：各接受中文名或 ID | 五種日主視角的關係分類之一 |
 
 ```python
@@ -389,7 +395,7 @@ assert FourPillarsAnalysis.model_validate_json(result.model_dump_json()) == resu
 不接受 `FourPillars` 物件或 stable ID；`FourPillars` 保存解析後的 canonical 物件。
 缺少／額外參數或非字串拋出 `TypeError`；長度、順序或字元集合不符拋出含柱位置的 `ValueError`。
 API 先透過原 `get_heavenly_stem()`、`get_earthly_branch()` 驗證全部四柱，
-再呼叫三次明干 `get_ten_god()` 和四次 `get_branch_ten_gods()`。
+並呼叫 `get_sexagenary_index()` 驗證每柱配對，全部通過後再呼叫三次明干 `get_ten_god()` 和四次 `get_branch_ten_gods()`。
 後者仍在 Layer 2 中逐一呼叫藏干十神，原結果物件不重建也不壓縮 trace。
 
 沿用 v0.2 的知識目錄與延遲載入要求，無新 dependency 或 YAML schema。
@@ -404,4 +410,19 @@ API 先透過原 `get_heavenly_stem()`、`get_earthly_branch()` 驗證全部四�
 
 `test_four_pillars.py` 覆蓋 canonical 案例全部明干與藏干、所有位置的非法輸入、
 十個日干切換、重複柱、API 結果重用、trace／來源、JSON 往返與結構一致性。
-只測試已定義的結構契約，不加入陰陽配柱、月令或日期規則。
+現已加上六十甲子成員驗證，十個日主測試各選循環中合法的日柱；不加入月令或日期規則。
+
+## Sexagenary Cycle v0.1
+
+沿用 `Pillar` 與原基本物件；按兩個集合的 `order` 排序，利用 Python 標準庫 `math.lcm`
+決定循環長度。查詢成員與序號均使用同一個生成方法，不建立額外的陰陽捷徑或 60 筆表。
+三個 API 也有 module-level wrapper。完整契約見 [sexagenary-cycle.md](sexagenary-cycle.md)。
+
+`test_sexagenary_cycle.py` 驗證完整性、唯一性、首尾及跨界序號、每干 6 次／每支 5 次、
+120 種配對分類、60 柱通過四柱 API、每個位置的非法配對在 Layer 2 分析前被拒絕，
+以及改動暫存 YAML order 後生成結果隨之改變。
+
+```powershell
+.venv/Scripts/python.exe -X utf8 examples/sexagenary_cycle.py
+.venv/Scripts/python.exe -m pytest -q
+```

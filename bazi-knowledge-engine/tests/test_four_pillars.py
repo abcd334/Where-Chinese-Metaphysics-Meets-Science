@@ -96,7 +96,8 @@ def test_api_requires_named_pillars_and_no_day_master_override(kb):
 
 @pytest.mark.parametrize("stem", "甲乙丙丁戊己庚辛壬癸")
 def test_day_master_follows_day_stem_for_every_master(kb, stem):
-    result = kb.analyze_four_pillars(**{**CHART, "day": stem + "戌"})
+    day_pillar = next(p for p in kb.generate_sexagenary_cycle() if p.stem.char == stem)
+    result = kb.analyze_four_pillars(**{**CHART, "day": stem + day_pillar.branch.char})
     assert result.day_master.char == stem
     assert result.pillars[2].visible_stem_analysis.role == "day_master"
     for pillar in result.pillars:
@@ -163,8 +164,10 @@ def test_existing_api_results_are_reused_without_copying(monkeypatch):
         assert item.visible_stem_analysis.ten_god_result is original
 
 
-def test_chart_trace_and_nested_source_records_are_resolvable(analysis):
+def test_chart_trace_and_nested_source_records_are_resolvable(kb, analysis):
     references = {"chart:input": analysis.chart, "day_master:ren": analysis.day_master}
+    references.update({f"sexagenary_cycle:{index}": pillar
+                       for index, pillar in enumerate(kb.generate_sexagenary_cycle(), start=1)})
     for item in analysis.pillars:
         references[f"pillars:{item.position}"] = item.pillar
         references[f"heavenly_stems:{item.pillar.stem.id}"] = item.pillar.stem

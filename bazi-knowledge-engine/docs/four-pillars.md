@@ -21,14 +21,16 @@ result = kb.analyze_four_pillars(
 )
 ```
 
-四個關鍵字都必須提供。每柱恰好兩個中文字：第一個存在於天干資料，第二個存在於地支資料。
+四個關鍵字都必須提供。每柱恰好兩個中文字：第一個存在於天干資料，第二個存在於地支資料，
+且配對必須屬於依基本資料 order 生成的六十甲子。
 丙寅、辛卯可以解析；丙、寅、ABC、甲甲、子甲及空字串均失敗。
 不自動去除空白，不接受拼音 ID、日期、模型物件或一整行四柱字串。
 非字串或參數缺漏為 `TypeError`；非法柱為含位置資訊的 `ValueError`。
 四柱全部通過基本解析後才進行 Layer 2 查詢；依賴錯誤會直接傳出。
 
-這個驗證僅證明輸入是存在於資料庫中的一干一支；「資料庫」在此指 YAML 知識集合，沒有資料庫服務。
-不檢查六十甲子配對、年與月／日與時的曆法一致性，也不證明四柱對應某個實際日期。
+例如甲丑的兩個字都存在，但配對不屬於六十甲子，會被拒絕。
+驗證已包含單柱合法性；不檢查年與月／日與時的曆法一致性，也不證明四柱對應某個實際日期。
+生成方法、查詢 API 與完整測試邊界見[六十甲子 v0.1](sexagenary-cycle.md)。
 caller 提供已知四柱；生日換算、節氣、時區及排盤都不在 v0.1 範圍。
 
 ## 資料模型
@@ -61,7 +63,7 @@ caller 提供已知四柱；生日換算、節氣、時區及排盤都不在 v0.
 
 每柱均呼叫 `get_branch_ten_gods(day_master.id, branch.id)`。
 Layer 3 不重新查一張藏干表，也不重新實作十神邏輯；原 `BranchTenGodResult` 直接嵌入結果。
-四個地支的處理一致，月支没有力量優先。藏干順序與 YAML 相同，不排序、不合併、不加權。
+四個地支的處理一致，月支沒有力量優先。藏干順序與 YAML 相同，不排序、不合併、不加權。
 
 ## 指定案例的完整結構摘要
 
@@ -92,10 +94,12 @@ assert [(item.hidden_stem.char, item.ten_god_result.ten_god.name_zh)
 外層沿用 `TraceStep`，有六個有序 lookup：
 
 1. `chart:input` → `pillars:year`、`pillars:month`、`pillars:day`、`pillars:hour`。
-2. 至 5. 各 `pillars:position` → 對應的 `heavenly_stems:id`、`earthly_branches:id`。
+2. 至 5. 各 `pillars:position` → 對應的 `heavenly_stems:id`、`earthly_branches:id`、`sexagenary_cycle:index`。
 6. `pillars:day` + 日干基本引用 → `day_master:id`。
 
 這些 chart／pillar／day_master 引用只在本次結果內有效，能由 `chart`、`pillars` 與 `day_master` 欄位解析。
+`sexagenary_cycle:index` 的 index 從 1 起；使用同一 KnowledgeBase 生成的循環解析。
+每個 Pillar 已包含循環成員的天干／地支 order，序列化結果也保留通過驗證的序號。
 外層 `source_ids` 為空 tuple：位置與日主選取是本次使用者規格的 **implementation convention**，
 不虛構古籍出處，不宣稱已完成文獻核對。
 

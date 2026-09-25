@@ -38,6 +38,7 @@ v1.0 Freeze 固定這個範圍、schema 與查詢契約。來源版本仍待覆�
 | 地支、藏干與季節 | 已有來源標記及查詢步驟的資料串接 |
 | Ten Gods Engine v0.1 | 已實作：日主天干 × 目標天干，十條 YAML 規則與結構化 trace |
 | Ten Gods Engine v0.2 | 已實作：明確日主 × 地支，依序取得各藏干的 v0.1 結果及來源 |
+| Sexagenary Cycle v0.1 | 已實作：依天干與地支 order 生成 60 個配對，提供合法性與 1-based 序號查詢 |
 | 合沖刑害 | 尚未實作 |
 | 通用條件式規則引擎 | 尚未實作 |
 
@@ -73,10 +74,10 @@ v0.2 是第二層既有能力的組合，不新增規則 YAML 或另一套十神
 
 回答「caller 提供的四柱中有哪些可列出的結構？」Structural analysis only.
 四柱以必要的 year／month／day／hour 參數輸入，每柱是兩個中文字：一個天干接一個地支。
-先驗證全部引用，再以日柱天干作為日主。
+先驗證全部引用與六十甲子成員資格，再以日柱天干作為日主。
 
 ```text
-已知四柱 → Pillar × 4 → FourPillars
+已知四柱 → 基本引用＋六十甲子驗證 → Pillar × 4 → FourPillars
                        ├─ day.stem → 日主
                        ├─ 年／月／時干 → get_ten_god()
                        └─ 四個地支 → get_branch_ten_gods()
@@ -88,7 +89,8 @@ v0.2 是第二層既有能力的組合，不新增規則 YAML 或另一套十神
 此層只組合 Layer 2 API，不新增生剋、藏干或十神 mapping；月支沒有額外優先或力量判斷。
 外層 trace 保存四柱位置與日主選取，嵌套結果保留既有規則 trace 和來源狀態。
 
-目前不驗證曆法配柱或日期可實現性，不排盤、不做日期轉四柱，沒有權重、旺衰、干支互動或解讀。
+單柱六十甲子配對已驗證；年／月及日／時之間的曆法配柱、日期可實現性仍不驗證。
+不排盤、不做日期轉四柱，沒有權重、旺衰、干支互動或解讀。
 完整輸入契約、模型與範例見 [四柱結構](four-pillars.md)。
 
 ## 四、命理解讀
@@ -109,6 +111,7 @@ v0.2 是第二層既有能力的組合，不新增規則 YAML 或另一套十神
 | 第二層藏干引用 | `knowledge/hidden_stems.yaml` |
 | 第二層十神規則 | `knowledge/ten_gods.yaml`；由既有 `KnowledgeBase` 載入與推導 |
 | 第二層季節關聯及關係說明 | `knowledge/concepts/seasons.yaml`、`hidden_stems.yaml` 等 |
+| 第二層六十甲子生成與驗證 | `KnowledgeBase.generate_sexagenary_cycle()`；從基本資料 order 推導，不新增 YAML 表 |
 | 第三層四柱結構 | `models.py` 的四柱模型、`KnowledgeBase.analyze_four_pillars()`；不新增知識 YAML |
 | 共用載入、驗證與來源 | 既有 `loader.py`、`models.py`、`knowledge/concepts/sources.yaml` |
 

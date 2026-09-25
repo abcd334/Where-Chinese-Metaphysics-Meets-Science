@@ -109,3 +109,15 @@ v0.2 組合既有藏干引用與 v0.1 規則，沒有新增傳統對應、規則
 
 計算或組合不解除十神的 `requires_validation`，不把藏干的 source_attested 擴大成權重或氣分類證明。
 地支陰陽版本、土的季節整合、天干取象、藏干季節成因及權重仍維持原有待驗證邊界。
+
+## Sexagenary Cycle v0.1 的採用範圍
+
+本版採用使用者指定的 canonical implementation specification：天干與地支按 order 排序，
+從兩者第一項開始，每步同時前進一項，以最小公倍數決定完整循環長度。
+公式與索引規約見 [sexagenary-cycle.md](sexagenary-cycle.md)，不另存 60 筆對照資料。
+
+基本順序引用既有資料；本次沒有重新查閱或擴大 `hko_order` 等來源的已核對範圍。
+配對公式在此是使用者授權的實作規格，其歷史文獻考證仍 **Requires source validation**。
+不新增 citation 或 SourceStatus 類型，也不將通過程式測試等同歷史或自然因果驗證。
+四柱外層 trace 的 `sexagenary_cycle:index` 表示已通過這項計算，沿用 implementation convention 的空 source_ids；
+所有 Layer 2 十神及藏干來源狀態保持不變。
